@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using Akka.Actor;
-using Serilog;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Collections;
+using Akka.Event;
 
 namespace vmstats
 {
@@ -14,7 +14,9 @@ namespace vmstats
         #region Instance variables
         private readonly string vmName;
         private readonly string date;
-        
+        private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
+
+
 
         // TODO Chenage this value when the metric files have been corrected to contain the right number of items.
         // Currently they are missing every other hour
@@ -40,7 +42,7 @@ namespace vmstats
 
         private void Accumulate(Messages.MetricsToBeProcessed msg)
         {
-            Log.Debug("This accumulator is for vmName={0}, date={1}. Process data request for vmName={2}, date={3}, time={4}, elements={5}", 
+            _log.Debug("This accumulator is for vmName={0}, date={1}. Process data request for vmName={2}, date={3}, time={4}, elements={5}", 
                 vmName, date, msg.vmName, msg.date, msg.time, msg.elements);
 
             // Save the information
@@ -64,7 +66,7 @@ namespace vmstats
                 SendMetrics();
             } else
             {
-                Log.Information("This accumulator is for vmName={0}, date={1}. Process NoMoreMetrics. Not enough metrics accumulated, count={2}",
+                _log.Info("This accumulator is for vmName={0}, date={1}. Process NoMoreMetrics. Not enough metrics accumulated, count={2}",
                     vmName, date, metrics.Count);
             }
 
@@ -72,7 +74,7 @@ namespace vmstats
 
         private void SendMetrics()
         {
-            Log.Information("This accumulator is for vmName={0}, date={1}. Sending metrics count={2}",
+            _log.Info("This accumulator is for vmName={0}, date={1}. Sending metrics count={2}",
                 vmName, date, metrics.Count);
             var um = new MetricStoreActor.UpsertMetric(vmName, metrics);
             metricStoreActor.Tell(um);

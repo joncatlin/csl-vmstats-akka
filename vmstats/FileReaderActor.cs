@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Akka.Actor;
-using Serilog;
 using System.IO;
 using System.Text.RegularExpressions;
+using Akka.Event;
 
 namespace vmstats
 {
@@ -30,6 +30,7 @@ namespace vmstats
         private readonly string pattern = @"[\w.]+";
         Regex rgxElements;
         Regex rgxVmNamePattern;
+        private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
         // Dispatcher for metric processing
         private IActorRef _metricAccumulatorDispatcherActor;
@@ -37,7 +38,7 @@ namespace vmstats
 
         public FileReaderActor(String vmNamePattern, IActorRef metricDispatcher)
         {
-             _metricAccumulatorDispatcherActor = metricDispatcher;
+            _metricAccumulatorDispatcherActor = metricDispatcher;
 
             // Initialize the patterns used to scan the file for metrics
             rgxElements = new Regex(pattern, RegexOptions.Compiled);
@@ -87,7 +88,7 @@ namespace vmstats
                 }
             }
 
-            Log.Information("Processed fileName={0}, with {1} lines", msg.fileName, lines++);
+            _log.Info("Processed fileName={0}, with {1} lines", msg.fileName, lines++);
 
             
 
@@ -101,7 +102,7 @@ namespace vmstats
                 System.IO.File.Move(msg.fileName, directory + "\\ProcessedFiles\\" + nameOnly);
             } catch (IOException e)
             {
-                Log.Error("Cannot move file name={0} to processed directory. Error={1}. File will have to be manually moved.", msg.fileName, e.Message);
+                _log.Error("Cannot move file name={0} to processed directory. Error={1}. File will have to be manually moved.", msg.fileName, e.Message);
             }
         }
 

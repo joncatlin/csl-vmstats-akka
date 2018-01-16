@@ -4,6 +4,7 @@ using System.Text;
 using Akka.Actor;
 using Akka.Routing;
 using System.Collections;
+using Akka.Event;
 
 namespace vmstats
 {
@@ -11,6 +12,7 @@ namespace vmstats
     {
         private Dictionary<string, IActorRef> routingTable = new Dictionary<string, IActorRef>();
         private Dictionary<string, IActorRef> storeTable = new Dictionary<string, IActorRef>();
+        private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
         public MetricAccumulatorDispatcherActor()
         {

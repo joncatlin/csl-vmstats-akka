@@ -1,56 +1,67 @@
 ﻿using System;
-using Serilog;
 using Akka.Actor;
-using Akka.Logger.Serilog;
 using Akka.Configuration;
 using System.IO;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 
 namespace vmstats
 {
     class Program
     {
         // Names of all the environment variables needed by the application
-        static readonly string ENV_COUCHBASE_NODES = "COUCHBASE_NODES";
 	    static readonly string ENV_DIRNAME = "DIR_NAME";
 	    static readonly string ENV_FILETYPE = "FILE_TYPE";
 	    static readonly string ENV_VMNAME_PATTERN = "VMNAME_PATTERN";
 
 	
         // Local state initialized from envornment variables
-	    static string couchbaseNodes = null;
         static string fileType = null;
-        static string statsdServer = null;
         static string dirName = "dummyfilename";
         static string vmNamePattern = null;
 
         static void Main(string[] args)
         {
-            // Load the configration from the resource.conf file
-            //string contents = File.ReadAllText("resource.conf");
-            //var config = ConfigurationFactory.ParseString(contents);
+/*
+            var configNL = new LoggingConfiguration();
 
-            var config = ConfigurationFactory.ParseString(@"log-config-on-start = on
-	stdout-loglevel = INFO
-	loglevel=INFO,  
-	loggers=[""Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog""]}");
+            // Step 2. Create targets and add them to the configuration 
+            var consoleTarget = new ColoredConsoleTarget();
+            configNL.AddTarget("console", consoleTarget);
+            
+            // Step 3. Set target properties 
+//            consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
+            consoleTarget.Layout = @"${date:format=HH\:mm\:ss} ${logger} ${message}";
+  //          fileTarget.FileName = "${basedir}/file.txt";
+ //           fileTarget.Layout = "${message}";
+
+            // Step 4. Define rules
+            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
+            configNL.LoggingRules.Add(rule1);
+            
+            // Step 5. Activate the configuration
+            LogManager.Configuration = configNL;
+            
 
 
 
-            /* COULDNOT GET THIS TO WORK
-            log = new LoggerConfiguration()
-                .WriteTo.ColoredConsole()
-                .MinimumLevel.Information()
-                .CreateLogger();
-            Serilog.Log.Logger = log;
-            //var system = ActorSystem.Create("my-test-system", "akka { loglevel=INFO,  loggers=[\"Akka.Logger.Serilog.SerilogLogger, Akka.Logger.Serilog\"]}");
+
+
+
+
+
+
+            /*
+                        var logger = new LoggerConfiguration()
+                            .WriteTo.ColoredConsole()
+                            .WriteTo.RollingFile("logs\\vmstats-{Date}.txt", outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message}{NewLine}{Properties}{NewLine}{Exception}")
+                            .MinimumLevel.Debug()
+                            .CreateLogger();
+                        Serilog.Log.Logger = logger;
             */
-
-            // Initialise the logging framwork
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Information()
-                .WriteTo.ColoredConsole()
-                .WriteTo.RollingFile("logs\\vmstats-{Date}.txt")
-                .CreateLogger();
+            // Get the configuration of the akka system
+            var config = ConfigurationFactory.ParseString(GetConfiguration());
 
             // Initialise state from environment variables
             GetEnvironmentVariables();
@@ -80,14 +91,12 @@ namespace vmstats
 
 
             // Wait until actor system terminated
-            Log.Information("Actor System Waiting");
             vmstatsActorSystem.WhenTerminated.Wait();
         }
 
 
         static void GetEnvironmentVariables ()
         {
-            couchbaseNodes = GetEnvironmentVariable(ENV_COUCHBASE_NODES);
             dirName = GetEnvironmentVariable(ENV_DIRNAME);
             fileType = GetEnvironmentVariable(ENV_FILETYPE);
             vmNamePattern = GetEnvironmentVariable(ENV_VMNAME_PATTERN);
@@ -100,12 +109,65 @@ namespace vmstats
             if (temp == null)
             {
                 // Log an error and exit the program
-                Log.Error("No Environment variable found for {0}. Exiting application.", envVarName);
                 System.Environment.Exit(-1);
             }
 
-            Log.Information("Environment variable {0} = {1}", envVarName, temp);
             return temp;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private static string GetConfiguration()
+        {
+            string config = @"
+                akka {  
+                    stdout-loglevel = DEBUG
+                    loglevel = DEBUG
+                    loggers = [""Akka.Logger.NLog.NLogLogger, Akka.Logger.NLog""]
+                    log-config-on-start = on
+
+                    actor
+                    {
+                      debug
+                      {
+                        receive = on      # log any received message
+                        autoreceive = on  # log automatically received messages, e.g. PoisonPill
+                        lifecycle = on    # log actor lifecycle changes
+                        event-stream = on # log subscription changes for Akka.NET event stream
+                        unhandled = on    # log unhandled messages sent to actors
+                      }
+                    }
+                  }
+                }
+
+                # Dispatcher for the Snapshot file store
+                snapshot -dispatcher {
+                    type = Dispatcher
+                    throughput = 10000
+                }
+
+
+            ";
+
+            return config;
+        }
+
+
     }
 }

@@ -6,8 +6,7 @@ using Akka.Persistence;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Collections;
-using Serilog;
-
+using Akka.Event;
 
 namespace vmstats
 {
@@ -43,6 +42,7 @@ namespace vmstats
 
         #region Instance variables
         private MetricStore _metricStore;
+        private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
         #endregion
 
         public override string PersistenceId
