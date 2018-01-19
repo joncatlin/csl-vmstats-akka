@@ -9,15 +9,17 @@
         public class MetricsToBeProcessed {
             public string vmName { get; set; }
             public string date { get; set; }
+            public string elementName { get; set; }
             public long time { get; set; }
-            public float[] elements { get; set; }
+            public float element { get; set; }
 
-            public MetricsToBeProcessed (string vmName, string date, long time, float[] elements)
+            public MetricsToBeProcessed (string vmName, string date, long time, float element, string elementName)
             {
                 this.vmName = vmName;
                 this.date = date;
                 this.time = time;
-                this.elements = elements;
+                this.element = element;
+                this.elementName = elementName;
             }
         }
 

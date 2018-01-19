@@ -95,11 +95,18 @@ namespace vmstats
             // Move the file to the processed directory so we do not process it again
             string nameOnly = Path.GetFileName(msg.fileName);
             string directory = Path.GetDirectoryName(msg.fileName);
+            string fileTo = directory + "\\ProcessedFiles\\" + nameOnly;
 
-            // To move a file or folder to a new location:
             try
             {
-                System.IO.File.Move(msg.fileName, directory + "\\ProcessedFiles\\" + nameOnly);
+                // Only move the file if it does not already exist in the destination folder
+                if (!File.Exists(fileTo))
+                {
+                    File.Move(msg.fileName, fileTo);
+                } else
+                {
+                    File.Delete(msg.fileName);
+                }
             } catch (IOException e)
             {
                 _log.Error("Cannot move file name={0} to processed directory. Error={1}. File will have to be manually moved.", msg.fileName, e.Message);
@@ -133,18 +140,20 @@ namespace vmstats
             int newLength = elements.Length - 3;
             float[] newElements = new float[newLength];
             
-            for (int index = 0; index < newLength; index++)
-            {
-                newElements[index] = float.Parse(elements[3 + index]);
-            }
-
             // Convert the time to a long in milliseconds
             string dateToConvert = date + " " + time;
             DateTime dt = DateTime.ParseExact(dateToConvert, "MM-dd-yyyy HH:mm:ss", null);
             long timestamp = dt.Ticks;
 
             // Send the metrics to the correct actor via the dispatcher
-            _metricAccumulatorDispatcherActor.Tell(new Messages.MetricsToBeProcessed(vmName, date, timestamp, newElements));
+            for (int index = 0; index < newLength; index++)
+            {
+                _metricAccumulatorDispatcherActor.Tell(new Messages.MetricsToBeProcessed(vmName, date, timestamp, 
+                    float.Parse(elements[3 + index]), headings[index]));
+            }
+
+
+
         }
     }
 }

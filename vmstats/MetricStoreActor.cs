@@ -10,33 +10,19 @@ using Akka.Event;
 
 namespace vmstats
 {
-    public class MetricStore
-    {
-        public SortedDictionary<long, float[]> metrics { get; set; }
-        public string vmName { get; set; }
-        public string date { get; set; }
-
-        public MetricStore (string vmName, string date)
-        {
-            this.vmName = vmName;
-            this.date = date;
-            this.metrics = new SortedDictionary<long, float[]>();
-        }
-    }
-
     public class MetricStoreActor : ReceivePersistentActor
     {
         #region Messages
         public class UpsertMetric
         {
-            public UpsertMetric(string name, SortedDictionary<long, float[]> metrics)
+            public UpsertMetric(string name, SortedDictionary<long, float> metrics)
             {
                 this.name = name;
                 this.metrics = metrics;
             }
 
             public string name { get; set; }
-            public SortedDictionary<long, float[]> metrics { get; set; }
+            public SortedDictionary<long, float> metrics { get; set; }
         }
         #endregion
 
@@ -85,22 +71,42 @@ namespace vmstats
 
         private void ProcessUpsertMetric(UpsertMetric um)
         {
-            // Check to see if each of the metrics in the upsert are in the retireved metrics.
-            // If not add them otheriwse update if they have changed.
-            foreach (long key in um.metrics.Keys)
+            // If the metric already existed then add any missing values to it from the received 
+            // ones in the upsert message
+            Metric retrievedMetric;
+            if (_metricStore.metrics.TryGetValue(um.name, out retrievedMetric))
             {
-                float[] value;
-                if (!_metricStore.metrics.TryGetValue(key, out value)) {
-                    // The value is not in the dictionary so add it
-                    _metricStore.metrics.Add(key, um.metrics[key]);
-                } else
+                // Check to see if each of the metrics in the upsert are in the retireved metrics.
+                // If not add them otheriwse update if they have changed.
+                foreach (long key in um.metrics.Keys)
                 {
-                    // The value exists so only update the dictionary if the value has changed
-                    if (value != um.metrics[key])
+                    float value;
+                    if (!retrievedMetric.Values.TryGetValue(key, out value))
                     {
-                        _metricStore.metrics[key] = um.metrics[key];
+                        // The value is not in the dictionary so add it
+                        retrievedMetric.Values.Add(key, um.metrics[key]);
+                    }
+                    else
+                    {
+                        // The value exists so only update the dictionary if the value has changed
+                        if (value != um.metrics[key])
+                        {
+                            retrievedMetric.Values[key] = um.metrics[key];
+                        }
                     }
                 }
+            }
+            else
+            {
+                // Add the new metrics to the store
+                var newMetric = new Metric(um.name, um.metrics);
+                _metricStore.metrics.Add(um.name, newMetric);
+            }
+
+            _log.Debug("Metrics received. VMName={0} Date={1}", _metricStore.vmName, _metricStore.date);
+            foreach (KeyValuePair<long, float> entry in um.metrics)
+            {
+                _log.Debug("Metric={0}. Time={1} Value={2}", um.name, DateTime.FromBinary(entry.Key), entry.Value);
             }
         }
     }
