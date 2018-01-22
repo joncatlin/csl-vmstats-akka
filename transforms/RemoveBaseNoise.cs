@@ -9,12 +9,12 @@ namespace transforms
     #region Message classes
     public class Transform
     {
-        public Transform(SortedDictionary<long, float[]> metrics)
+        public Transform(SortedDictionary<long, float> metrics)
         {
-            this.metrics = new SortedDictionary<long, float[]>();
+            this.metrics = new SortedDictionary<long, float>();
         }
 
-        public SortedDictionary<long, float[]> metrics { get; set; }
+        public SortedDictionary<long, float> metrics { get; set; }
     }
     #endregion
 
@@ -31,7 +31,18 @@ namespace transforms
 
         private void CalculateTransformation(Transform msg)
         {
+            // Calculate the rolling average and use it as the base noise level
+            // TODO determine where the index and rollingAvgLength will come from
+            int rollingAvgLength = 10;
+            int index = 0;
+            float baseNoise = findLowestRollingAvg(msg.metrics, index, rollingAvgLength);
 
+            // Subtract the base noise level from the values in the message
+            Dictionary<long, float> newValues = new Dictionary<long, float>();
+            foreach (KeyValuePair<long, float> entry in msg.metrics)
+            {
+                newValues.Add(entry.Key, entry.Value - baseNoise);
+            }
         }
 
 
@@ -40,39 +51,25 @@ namespace transforms
          * This method calculates the smallest rolling avg over a series of datapoints for a given rolling average length
          * @return 
          */
-        private void findLowestRollingAvg(SortedDictionary<long, float[]> metrics, int index, int rollingAvgLength)
+        private float findLowestRollingAvg(SortedDictionary<long, float> values, int index, int rollingAvgLength)
         {
-            foreach (KeyValuePair<long, float[]> entry in metrics)
-            {
+            // Get the values to be processed into an array
+            float[] valuesArray = new float[values.Count];
+            values.Values.CopyTo(valuesArray, 0);
 
-            }
-            var metricsList = metrics.Values.CopyTo();
-            for (int i=0; i < metrics.Count - rollingAvgLength; i++)
-            {
-
-                float sum = 0;
-                for (int offset = 0; offset < rollingAvgLength; offset++)
-                {
-                    sum += metrics[]Float.valueOf(metrics.get(i + offset));
-                }
-
-            }
-
-
-
+            // Initialize variables
             float rollingAvg = float.MaxValue; // Large number so first average is always less
             int rollingAvgPosition = -1;
             float max = 0;
             float avg = 0;
 
             // Calculate the smallest rolling average, overall average and a max for the datapoints
-            for (int i = 0; i < metrics.size() - rollingAvgLength; i++)
+            for (int i = 0; i < valuesArray.Length - rollingAvgLength; i++)
             {
-
                 float sum = 0;
                 for (int offset = 0; offset < rollingAvgLength; offset++)
                 {
-                    sum += Float.valueOf(metrics.get(i + offset));
+                    sum += valuesArray[i + offset];
                 }
 
                 // Initialize the position of the first rolling average
@@ -80,7 +77,7 @@ namespace transforms
 
                 // Calculate the new values for the comparison
                 float newRollingAvg = sum / rollingAvgLength;
-                float newMax = Float.valueOf(metrics.get(i + rollingAvgLength));
+                float newMax = valuesArray[i + rollingAvgLength];
 
                 // Store the new values if appropriate
                 if (newRollingAvg < rollingAvg)
@@ -91,23 +88,17 @@ namespace transforms
                 if (newMax > max) max = newMax;
 
                 // Add to the overall average
-                avg += Float.valueOf(metrics.get(i));
+                avg += valuesArray[i];
             }
 
             // The overall average is missing values so add them before calculating the avg
-            for (int i = metrics.size() - rollingAvgLength; i < metrics.size(); i++)
-                avg += Float.valueOf(metrics.get(i));
-            avg = avg / metrics.size();
+            for (int i = valuesArray.Length - rollingAvgLength; i < valuesArray.Length; i++)
+                avg += valuesArray[i];
+            avg = avg / valuesArray.Length;
 
-            Base result = new Base();
-            result.rollingAvg = rollingAvg;
-            result.max = max;
-            result.avg = avg;
-            result.rollingAvgPosition = rollingAvgPosition;
+            _log.Debug("Rolling average: {0}, max: {1}, avg: {2}, rolling avg position in data: {3}", rollingAvg, max, avg, rollingAvgPosition );
 
-            LOGGER.log(Level.FINE, "Rolling average: {0}, max: {1}, avg: {2}, rolling avg position in data: {3}", new Object[] { result.rollingAvg, result.max, result.avg, result.rollingAvgPosition });
-
-            return result;
+            return rollingAvg;
         }
 
 
