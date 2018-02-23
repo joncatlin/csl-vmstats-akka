@@ -7,7 +7,7 @@ namespace vmstats.lang
 {
     public class Start
     {
-
+/*
         private static void Main(string[] args)
         {
             try
@@ -40,5 +40,6 @@ namespace vmstats.lang
                 Console.WriteLine("Error: " + ex);
             }
         }
+        */
     }
 }

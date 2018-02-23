@@ -3,23 +3,34 @@ using System.Collections.Generic;
 using System.Text;
 using Akka.Actor;
 using Akka.Event;
+using vmstats.Metric;
 
 namespace transforms
 {
     #region Message classes
     public class Transform
     {
-        public Transform(SortedDictionary<long, float> metrics)
+        public Transform(Metric metr, Dictionary<string, string>paramaters)
         {
-            this.metrics = new SortedDictionary<long, float>();
+            Metric = metric;
+            Parameters = paramaters;
         }
 
-        public SortedDictionary<long, float> metrics { get; set; }
+        public Transform(SortedDictionary<long, float> metrics)
+        {
+            Metric = metrics;
+            Parameters = new Dictionary<string, string>();
+        }
+
+        public SortedDictionary<long, float> Metrics { get; set; }
+        public Dictionary<string, string> Parameters { get; set; }
     }
     #endregion
 
     public class RemoveBaseNoise : ReceiveActor
     {
+        public static readonly string ROLLING_AVG_LENGTH = "ROLLING_AVG_LENGTH";
+        public static readonly int ROLLING_AVG_LENGTH_DEFAULT_VALUE = 10;
 
         private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
@@ -32,16 +43,16 @@ namespace transforms
         private void CalculateTransformation(Transform msg)
         {
             // Calculate the rolling average and use it as the base noise level
-            // TODO determine where the index and rollingAvgLength will come from
-            int rollingAvgLength = 10;
+            int rollingAvgLength = (msg.Parameters.ContainsKey(ROLLING_AVG_LENGTH)) ? Int32.Parse(msg.Parameters[ROLLING_AVG_LENGTH]) : 
+                ROLLING_AVG_LENGTH_DEFAULT_VALUE;
             int index = 0;
-            float baseNoise = findLowestRollingAvg(msg.metrics, index, rollingAvgLength);
+            float baseNoise = FindLowestRollingAvg(msg.Metrics, index, rollingAvgLength);
 
             // Subtract the base noise level from the values in the message
             Dictionary<long, float> newValues = new Dictionary<long, float>();
-            foreach (KeyValuePair<long, float> entry in msg.metrics)
+            foreach (KeyValuePair<long, float> entry in msg.Metrics)
             {
-                newValues.Add(entry.Key, entry.Value - baseNoise);
+                newValues.Add(entry.Key, Math.Max(entry.Value - baseNoise,0));
             }
         }
 
@@ -51,7 +62,7 @@ namespace transforms
          * This method calculates the smallest rolling avg over a series of datapoints for a given rolling average length
          * @return 
          */
-        private float findLowestRollingAvg(SortedDictionary<long, float> values, int index, int rollingAvgLength)
+        private float FindLowestRollingAvg(SortedDictionary<long, float> values, int index, int rollingAvgLength)
         {
             // Get the values to be processed into an array
             float[] valuesArray = new float[values.Count];
@@ -109,56 +120,4 @@ namespace transforms
 
 
 
-
-
-
-
-
-public class StatisticRemoveBase
-{
-
-    // Initialize the logger
-    private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
-
-
-    private class Base
-    {
-        float rollingAvg;
-        float max;
-        float avg;
-        int rollingAvgPosition;
-    }
-
-
-    public ArrayList<String> removeBase(ArrayList<String> metrics, float percentage, int sampleSize)
-    {
-
-        ArrayList<String> transformed = new ArrayList<String>(metrics.size());
-        float temp;
-
-        // First find the lowest rolling average for the data set
-        Base result = findLowestRollingAvg(metrics, sampleSize);
-
-        // Calculate a cutoff value to remove noise
-
-        float cutOff = ((result.max - result.rollingAvg) / 100F * percentage) + result.rollingAvg;
-        //		float cutOff = (result.max / 100F * percentage) + result.rollingAvg;
-
-        // Zeroize any number less than the cutoff value to remove the background noise 
-        for (int i = 0; i < metrics.size(); i++)
-        {
-            temp = Float.valueOf(metrics.get(i));
-            temp = (temp < cutOff) ? 0 : temp - result.rollingAvg;
-            transformed.add(String.valueOf(temp));
-        }
-
-        return transformed;
-
-    }
-
-
-    // TODO remove lowest rolling average of net min from the netavg data 
-
-
-}
 
