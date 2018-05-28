@@ -1,31 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Akka.Actor;
 using Akka.Event;
-using vmstats.Metric;
+using vmstats;
 
 namespace transforms
 {
     #region Message classes
+
+    /// <summary>
+    /// This class holds a metric that is to be transformed, The transformation 
+    /// can be supplied with or without parameters to override the default transformation
+    /// parameters.
+    /// </summary>
     public class Transform
     {
-        public Transform(Metric metr, Dictionary<string, string>paramaters)
+        public Transform(Metric metric, Dictionary<string, string>paramaters)
         {
-            Metric = metric;
+            Measurements = metric;
             Parameters = paramaters;
         }
 
-        public Transform(SortedDictionary<long, float> metrics)
+        public Transform(Metric metric)
         {
-            Metric = metrics;
+            Measurements = metric;
             Parameters = new Dictionary<string, string>();
         }
 
-        public SortedDictionary<long, float> Metrics { get; set; }
+        public Metric Measurements { get; set; }
         public Dictionary<string, string> Parameters { get; set; }
     }
     #endregion
+
 
     public class RemoveBaseNoise : ReceiveActor
     {
@@ -46,11 +52,11 @@ namespace transforms
             int rollingAvgLength = (msg.Parameters.ContainsKey(ROLLING_AVG_LENGTH)) ? Int32.Parse(msg.Parameters[ROLLING_AVG_LENGTH]) : 
                 ROLLING_AVG_LENGTH_DEFAULT_VALUE;
             int index = 0;
-            float baseNoise = FindLowestRollingAvg(msg.Metrics, index, rollingAvgLength);
+            float baseNoise = FindLowestRollingAvg(msg.Measurements.Values, index, rollingAvgLength);
 
             // Subtract the base noise level from the values in the message
             Dictionary<long, float> newValues = new Dictionary<long, float>();
-            foreach (KeyValuePair<long, float> entry in msg.Metrics)
+            foreach (KeyValuePair<long, float> entry in msg.Measurements.Values)
             {
                 newValues.Add(entry.Key, Math.Max(entry.Value - baseNoise,0));
             }
@@ -111,9 +117,6 @@ namespace transforms
 
             return rollingAvg;
         }
-
-
-
     }
 }
 

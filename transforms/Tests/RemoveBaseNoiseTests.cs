@@ -7,6 +7,7 @@ using Akka.Actor;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using vmstats;
 
 namespace transforms.Tests
 {
@@ -55,7 +56,8 @@ namespace transforms.Tests
             d.Add(18, 1.0F);
             d.Add(19, 1.0F);
             d.Add(20, 1.0F);
-            var msg = new Transform(d);
+            var metric = new Metric("", d);
+            var msg = new Transform(metric);
 
             actor.Tell(msg);
         }
@@ -85,7 +87,8 @@ namespace transforms.Tests
             d.Add(18, 1.0F);
             d.Add(19, 1.0F);
             d.Add(20, 1.0F);
-            var msg = new Transform(d);
+            var metric = new Metric("", d);
+            var msg = new Transform(metric);
 
             actor.Tell(msg);
         }
@@ -118,7 +121,8 @@ namespace transforms.Tests
             d.Add(20, 1.0F);
             var p = new Dictionary<string, string>();
             p.Add(RemoveBaseNoise.ROLLING_AVG_LENGTH, "15");
-            var msg = new Transform(d,p);
+            var metric = new Metric("", d);
+            var msg = new Transform(metric, p);
 
             actor.Tell(msg);
         }
@@ -152,19 +156,22 @@ namespace transforms.Tests
             // Avg should be 1
             var p = new Dictionary<string, string>();
             p.Add(RemoveBaseNoise.ROLLING_AVG_LENGTH, "5");
-            var msg = new Transform(d, p);
+            var metric = new Metric("", d);
+            var msg = new Transform(metric, p);
             actor.Tell(msg);
 
             // Avg should be 13/6
             p = new Dictionary<string, string>();
             p.Add(RemoveBaseNoise.ROLLING_AVG_LENGTH, "6");
-            msg = new Transform(d, p);
+            metric = new Metric("", d);
+            msg = new Transform(metric, p);
             actor.Tell(msg);
 
             // Avg should be 19/10
             p = new Dictionary<string, string>();
             p.Add(RemoveBaseNoise.ROLLING_AVG_LENGTH, "10");
-            msg = new Transform(d, p);
+            metric = new Metric("", d);
+            msg = new Transform(metric, p);
             actor.Tell(msg);
 
 
@@ -202,8 +209,5 @@ namespace transforms.Tests
 
             return config;
         }
-
-
-
     }
 }
