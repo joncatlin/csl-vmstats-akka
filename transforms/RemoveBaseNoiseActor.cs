@@ -30,17 +30,33 @@ namespace transforms
         public Metric Measurements { get; set; }
         public Dictionary<string, string> Parameters { get; set; }
     }
+
+    /// <summary>
+    /// This class holds the result of a transformation.
+    /// </summary>
+    public class Result
+    {
+        public Result(Metric metric)
+        {
+            Measurements = metric;
+        }
+
+        public Metric Measurements { get; set; }
+    }
+
     #endregion
 
 
-    public class RemoveBaseNoise : ReceiveActor
+    public class RemoveBaseNoiseActor : ReceiveActor
     {
         public static readonly string ROLLING_AVG_LENGTH = "ROLLING_AVG_LENGTH";
         public static readonly int ROLLING_AVG_LENGTH_DEFAULT_VALUE = 10;
+        public static readonly string TRANSFORM_NAME = "RBN";
+        public static readonly string TRANSFORM_NAME_CONCATENATOR = ":";
 
         private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
-        public RemoveBaseNoise()
+        public RemoveBaseNoiseActor()
         {
             Receive<Transform>(msg => CalculateTransformation(msg));
 
@@ -55,11 +71,16 @@ namespace transforms
             float baseNoise = FindLowestRollingAvg(msg.Measurements.Values, index, rollingAvgLength);
 
             // Subtract the base noise level from the values in the message
-            Dictionary<long, float> newValues = new Dictionary<long, float>();
+            SortedDictionary<long, float> newValues = new SortedDictionary<long, float>();
             foreach (KeyValuePair<long, float> entry in msg.Measurements.Values)
             {
                 newValues.Add(entry.Key, Math.Max(entry.Value - baseNoise,0));
             }
+
+            // Return the results to the caller
+            var metric = new Metric(msg.Measurements.Name + TRANSFORM_NAME_CONCATENATOR + TRANSFORM_NAME, newValues);
+            var result = new Result(metric);
+            Sender.Tell(result);
         }
 
 

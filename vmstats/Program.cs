@@ -23,7 +23,7 @@ namespace vmstats
 
         static void Main(string[] args)
         {
-/*
+
             var configNL = new LoggingConfiguration();
 
             // Step 2. Create targets and add them to the configuration 
@@ -60,6 +60,7 @@ namespace vmstats
                             .CreateLogger();
                         Serilog.Log.Logger = logger;
             */
+
             // Get the configuration of the akka system
             var config = ConfigurationFactory.ParseString(GetConfiguration());
 
@@ -93,7 +94,6 @@ namespace vmstats
             // Wait until actor system terminated
             vmstatsActorSystem.WhenTerminated.Wait();
         }
-
 
         static void GetEnvironmentVariables ()
         {

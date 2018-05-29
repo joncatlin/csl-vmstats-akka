@@ -8,14 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Akka" Version="1.3.5" />
+    <PackageReference Include="Akka" Version="1.3.7" />
     <PackageReference Include="Akka.Logger.NLog" Version="1.2.0" />
     <PackageReference Include="Akka.TestKit.NUnit3" Version="1.3.2" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="1.0.0-rtm-rc6" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.1.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\vmstats\vmstats-akka.csproj" />
+    <ProjectReference Include="..\vmstats\vmstats.csproj" />
   </ItemGroup>
 
   <ItemGroup>
