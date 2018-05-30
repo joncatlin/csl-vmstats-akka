@@ -89,7 +89,7 @@ namespace vmstats
                .ScheduleTellRepeatedly(TimeSpan.FromSeconds(0),
                          TimeSpan.FromSeconds(30),
                           directoryWatcherActor, DirectoryWatcherActor.CheckDirCommand, ActorRefs.NoSender);
-
+            
 
             // Wait until actor system terminated
             vmstatsActorSystem.WhenTerminated.Wait();

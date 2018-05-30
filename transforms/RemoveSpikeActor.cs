@@ -6,26 +6,39 @@ using vmstats;
 
 namespace transforms
 {
-    public class RemoveBaseNoiseActor : ReceiveActor
+    public class RemoveSpikeActor : ReceiveActor
     {
-        public static readonly string ROLLING_AVG_LENGTH = "ROLLING_AVG_LENGTH";
-        public static readonly int ROLLING_AVG_LENGTH_DEFAULT_VALUE = 10;
-        public static readonly string TRANSFORM_NAME = "RBN";
+        public static readonly string SPIKE_WINDOW_LENGTH = "SPIKE_WINDOW_LENGTH";
+        public static readonly int SPIKE_WINDOW_LENGTH_DEFAULT_VALUE = 1;
+        public static readonly string BASE_WINDOW_LENGTH = "BASE_WINDOW_LENGTH";
+        public static readonly int BASE_WINDOW_LENGTH_DEFAULT_VALUE = 1;
+        public static readonly string TRANSFORM_NAME = "RSP";
         public static readonly string TRANSFORM_NAME_CONCATENATOR = ":";
 
         private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
-        public RemoveBaseNoiseActor()
+        public RemoveSpikeActor()
         {
             Receive<Transform>(msg => CalculateTransformation(msg));
-
         }
 
         private void CalculateTransformation(Transform msg)
         {
-            // Calculate the rolling average and use it as the base noise level
-            int rollingAvgLength = (msg.Parameters.ContainsKey(ROLLING_AVG_LENGTH)) ? Int32.Parse(msg.Parameters[ROLLING_AVG_LENGTH]) : 
-                ROLLING_AVG_LENGTH_DEFAULT_VALUE;
+            // Obtain any changes in the default settings
+            int spikeWindowLength = (msg.Parameters.ContainsKey(SPIKE_WINDOW_LENGTH)) ? Int32.Parse(msg.Parameters[SPIKE_WINDOW_LENGTH]) :
+                SPIKE_WINDOW_LENGTH_DEFAULT_VALUE;
+            int baseWindowLength = (msg.Parameters.ContainsKey(BASE_WINDOW_LENGTH)) ? Int32.Parse(msg.Parameters[BASE_WINDOW_LENGTH]) :
+                BASE_WINDOW_LENGTH_DEFAULT_VALUE;
+
+            // Scan the values for spikes that match the windows size. A spike is determined by a series of base values followed by a 
+            // series of values over base followed by a return to a series of values at base. E.g. 0,0,0,5,7,0,0,0. The spike would be 5 & 7.
+            // Get the values to be processed into an array
+            float[] valuesArray = new float[msg.Measurements.Values.Count];
+            msg.Measurements.Values.Values.CopyTo(valuesArray, 0);
+
+            // TODO complete this code, create test for this class, determine all the other transformation classes needed to analyze the results
+
+
             int index = 0;
             float baseNoise = FindLowestRollingAvg(msg.Measurements.Values, index, rollingAvgLength);
 
