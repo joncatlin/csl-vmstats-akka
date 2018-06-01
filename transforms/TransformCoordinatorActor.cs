@@ -6,22 +6,13 @@ using vmstats;
 
 namespace transforms
 {
-    public class RemoveSpikeActor : ReceiveActor
+    public class TransformCoordinatorActor : ReceiveActor
     {
-        public static readonly string SPIKE_WINDOW_LENGTH = "SPIKE_WINDOW_LENGTH";
-        public static readonly int SPIKE_WINDOW_LENGTH_DEFAULT_VALUE = 1;
-        public static readonly string BASE_WINDOW_LENGTH = "BASE_WINDOW_LENGTH";
-        public static readonly int BASE_WINDOW_LENGTH_DEFAULT_VALUE = 1;
-        public static readonly string BASE_VALUE = "BASE_VALUE";
-        public static readonly int BASE_VALUE_DEFAULT_VALUE = 0;
-        public static readonly string TRANSFORM_NAME = "RSP";
-        public static readonly string TRANSFORM_NAME_CONCATENATOR = ":";
-
         private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
-        public RemoveSpikeActor()
+        public TransformCoordinatorActor()
         {
-            Receive<Transform>(msg => CalculateTransformation(msg));
+            Receive<TransformSeries>(msg => StartTransforms(msg));
         }
 
         private void CalculateTransformation(Transform msg)

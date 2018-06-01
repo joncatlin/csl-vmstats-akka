@@ -12,6 +12,7 @@ namespace transforms
         public static readonly string TRANSFORM_NAME_CONCATENATOR = ":";
         public static readonly string TRANSFORM_COLLECTION_START = "(";
         public static readonly string TRANSFORM_COLLECTION_END = ")";
+        public static readonly string TRANSFORM_COLLECTION_CONTATENATOR = "+";
 
         private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
@@ -47,7 +48,7 @@ namespace transforms
             {
                 if (!first)
                 {
-                    sb.Append(TRANSFORM_NAME_CONCATENATOR);
+                    sb.Append(TRANSFORM_COLLECTION_CONTATENATOR);
                 }
                 else
                 {

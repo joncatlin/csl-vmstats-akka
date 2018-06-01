@@ -4,6 +4,7 @@ using Akka.TestKit.NUnit3;
 using Akka.Actor;
 using vmstats;
 using Akka.Configuration;
+using Newtonsoft.Json;
 
 namespace transforms.Tests
 {
@@ -23,7 +24,7 @@ namespace transforms.Tests
             /***************************************************************************
              * Call the test to be performed
              ***************************************************************************/
-            var msg = test.generateTestData_Success_specific_rolling_avg_length();
+            var msg = test.generateTestData_When_AllValuesAreNoise_Expect_AllReturnValuesSetToBaseNoise();
 
             // Create the actor and send it the data to be transformed
             var actor = sys.ActorOf(Props.Create(() => new RemoveBaseNoiseActor()));
@@ -34,9 +35,9 @@ namespace transforms.Tests
         }
 
         [Test]
-        public void Success_all_values_are_zero()
+        public void When_AllValuesAreNoise_Expect_AllReturnValuesSetToBaseNoise()
         {
-            var msg = generateTestData_Success_all_values_are_zero();
+            var msg = generateTestData_When_AllValuesAreNoise_Expect_AllReturnValuesSetToBaseNoise();
 
             // Create the actor and send it the data to be transformed
             var actor = Sys.ActorOf(Props.Create(() => new RemoveBaseNoiseActor()));
@@ -44,14 +45,17 @@ namespace transforms.Tests
             var result = ExpectMsg<Result>();
 
             // Create the expected results
-            var expectedResults = generateResults_Success_all_values_are_zero();
+            var expectedResult = generateResults_When_AllValuesAreNoise_Expect_AllReturnValuesSetToBaseNoise();
 
             // Check expected results match real results
-            Assert.AreEqual(expectedResults.Values, result.Measurements.Values);
-            Assert.AreEqual(expectedResults.Name, result.Measurements.Name);
+            CollectionAssert.AreEqual(expectedResult.Values, result.Measurements.Values,
+                "Resuls and Expected values are different.\nExpected values = {0}\nActual result values = {1}. ",
+                new object[] { JsonConvert.SerializeObject(expectedResult.Values), JsonConvert.SerializeObject(result.Measurements.Values) }
+                );
+            Assert.AreEqual(expectedResult.Name, result.Measurements.Name);
         }
 
-        public Transform generateTestData_Success_all_values_are_zero()
+        public Transform generateTestData_When_AllValuesAreNoise_Expect_AllReturnValuesSetToBaseNoise()
         {
             // Create the data for the test
             var d = new SortedDictionary<long, float>();
@@ -59,12 +63,12 @@ namespace transforms.Tests
             {
                 d.Add(x, 1.0F);
             }
-            var metric = new Metric("Success_all_values_are_zero", d);
+            var metric = new Metric("When_AllValuesAreNoise_Expect_AllReturnValuesSetToBaseNoise", d);
             return new Transform(metric);
 
         }
 
-        public Metric generateResults_Success_all_values_are_zero()
+        public Metric generateResults_When_AllValuesAreNoise_Expect_AllReturnValuesSetToBaseNoise()
         {
             // Create the data for the expected result
             var d = new SortedDictionary<long, float>();
@@ -73,15 +77,15 @@ namespace transforms.Tests
                 d.Add(x, 0.0F);
             }
 
-            return new Metric("Success_all_values_are_zero:RBN", d);
+            return new Metric("When_AllValuesAreNoise_Expect_AllReturnValuesSetToBaseNoise:RBN", d);
 
         }
 
         [Test]
-        public void Success_default_rolling_avg_length()
+        public void When_SomeNoisePresent_Expect_AllBaseNoiseIsRemoved()
         {
             // Create the data for the test
-            var msg = generateTestData_Success_default_rolling_avg_length();
+            var msg = generateTestData_When_SomeNoisePresent_Expect_AllBaseNoiseIsRemoved();
 
             // Perform the test
             var actor = Sys.ActorOf(Props.Create(() => new RemoveBaseNoiseActor()));
@@ -89,14 +93,17 @@ namespace transforms.Tests
             var result = ExpectMsg<Result>();
 
             // Create the expected results
-            var expectedResult = generateResults_Success_default_rolling_avg_length();
+            var expectedResult = generateResults_When_SomeNoisePresent_Expect_AllBaseNoiseIsRemoved();
 
             // Check results
-            Assert.AreEqual(expectedResult.Values, result.Measurements.Values);
+            CollectionAssert.AreEqual(expectedResult.Values, result.Measurements.Values,
+                "Resuls and Expected values are different.\nExpected values = {0}\nActual result values = {1}. ",
+                new object[] { JsonConvert.SerializeObject(expectedResult.Values), JsonConvert.SerializeObject(result.Measurements.Values) }
+                );
             Assert.AreEqual(expectedResult.Name, result.Measurements.Name);
         }
 
-        public Transform generateTestData_Success_default_rolling_avg_length()
+        public Transform generateTestData_When_SomeNoisePresent_Expect_AllBaseNoiseIsRemoved()
         {
             // Create the data for the test
             var d = new SortedDictionary<long, float>();
@@ -120,11 +127,11 @@ namespace transforms.Tests
             d.Add(18, 1.0F);
             d.Add(19, 1.0F);
             d.Add(20, 1.0F);
-            var metric = new Metric("Success_default_rolling_avg_length", d);
+            var metric = new Metric("When_SomeNoisePresent_Expect_AllBaseNoiseIsRemoved", d);
             return new Transform(metric);
         }
 
-        public Metric generateResults_Success_default_rolling_avg_length()
+        public Metric generateResults_When_SomeNoisePresent_Expect_AllBaseNoiseIsRemoved()
         {
             // Create the expected result
             var d = new SortedDictionary<long, float>();
@@ -148,15 +155,15 @@ namespace transforms.Tests
             d.Add(18, 0.0F);
             d.Add(19, 0.0F);
             d.Add(20, 0.0F);
-            return new Metric("Success_default_rolling_avg_length:RBN", d);
+            return new Metric("When_SomeNoisePresent_Expect_AllBaseNoiseIsRemoved:RBN", d);
         }
 
 
         [Test]
-        public void Success_specific_rolling_avg_length()
+        public void When_SomeNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved()
         {
             // Create the data for the test
-            var msg = generateTestData_Success_specific_rolling_avg_length();
+            var msg = generateTestData_When_SomeNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved();
 
             // Perform the test
             var actor = Sys.ActorOf(Props.Create(() => new RemoveBaseNoiseActor()));
@@ -164,14 +171,17 @@ namespace transforms.Tests
             var result = ExpectMsg<Result>();
 
             // Create the expected results
-            var expectedResult = generateResults_Success_specific_rolling_avg_length();
+            var expectedResult = generateResults_When_SomeNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved();
 
             // Check results
-            Assert.AreEqual(expectedResult.Values, result.Measurements.Values);
+            CollectionAssert.AreEqual(expectedResult.Values, result.Measurements.Values,
+                "Resuls and Expected values are different.\nExpected values = {0}\nActual result values = {1}. ",
+                new object[] { JsonConvert.SerializeObject(expectedResult.Values), JsonConvert.SerializeObject(result.Measurements.Values) }
+                );
             Assert.AreEqual(expectedResult.Name, result.Measurements.Name);
         }
 
-        public Transform generateTestData_Success_specific_rolling_avg_length()
+        public Transform generateTestData_When_SomeNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved()
         {
             // Create the data for the test
             var d = new SortedDictionary<long, float>();
@@ -195,7 +205,7 @@ namespace transforms.Tests
             d.Add(18, 180.0F);
             d.Add(19, 1.0F);
             d.Add(20, 0.0F);
-            var metric = new Metric("Success_specific_rolling_avg_length", d);
+            var metric = new Metric("When_SomeNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved", d);
 
             // Create the poarameter to oiverride the rolling everage length
             var p = new Dictionary<string, string>();
@@ -204,7 +214,7 @@ namespace transforms.Tests
             return new Transform(metric, p);
         }
 
-        public Metric generateResults_Success_specific_rolling_avg_length()
+        public Metric generateResults_When_SomeNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved()
         {
             // Create the expected result
             var d = new SortedDictionary<long, float>();
@@ -228,16 +238,16 @@ namespace transforms.Tests
             d.Add(18, 179.0F);
             d.Add(19, 0.0F);
             d.Add(20, 0.0F);
-            return new Metric("Success_specific_rolling_avg_length:RBN", d);
+            return new Metric("When_SomeNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved:RBN", d);
         }
 
 
 
         [Test]
-        public void Success_complex_rolling_avg_length()
+        public void When_VarietyOfNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved()
         {
             // Create the data for the test
-            var metric = generateTestData_Success_complex_rolling_avg_length();
+            var metric = generateTestData_When_VarietyOfNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved();
 
             // Create the actor
             var actor = Sys.ActorOf(Props.Create(() => new RemoveBaseNoiseActor()));
@@ -250,10 +260,13 @@ namespace transforms.Tests
             var result = ExpectMsg<Result>();
 
             // Create the expected results
-            var expectedResult = generateResults_Success_complex_rolling_avg_length_5();
+            var expectedResult = generateResults_When_VarietyOfNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved_5();
 
             // Check results
-            Assert.AreEqual(expectedResult.Values, result.Measurements.Values);
+            CollectionAssert.AreEqual(expectedResult.Values, result.Measurements.Values,
+                "Resuls and Expected values are different.\nExpected values = {0}\nActual result values = {1}. ",
+                new object[] { JsonConvert.SerializeObject(expectedResult.Values), JsonConvert.SerializeObject(result.Measurements.Values) }
+                );
             Assert.AreEqual(expectedResult.Name, result.Measurements.Name);
 
             // Rolling Avg Length = 5, Avg should be 2
@@ -264,15 +277,18 @@ namespace transforms.Tests
             result = ExpectMsg<Result>();
 
             // Create the expected results
-            expectedResult = generateResults_Success_complex_rolling_avg_length_6();
+            expectedResult = generateResults_When_VarietyOfNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved_6();
 
             // Check results
-            Assert.AreEqual(expectedResult.Values, result.Measurements.Values);
+            CollectionAssert.AreEqual(expectedResult.Values, result.Measurements.Values,
+                "Resuls and Expected values are different.\nExpected values = {0}\nActual result values = {1}. ",
+                new object[] { JsonConvert.SerializeObject(expectedResult.Values), JsonConvert.SerializeObject(result.Measurements.Values) }
+                );
             Assert.AreEqual(expectedResult.Name, result.Measurements.Name);
 
         }
 
-        public Metric generateTestData_Success_complex_rolling_avg_length()
+        public Metric generateTestData_When_VarietyOfNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved()
         {
             // Create the data for the test
             var d = new SortedDictionary<long, float>();
@@ -296,10 +312,10 @@ namespace transforms.Tests
             d.Add(18, 20.0F);
             d.Add(19, 21.0F);
             d.Add(20, 1.0F);
-            return new Metric("Success_complex_rolling_avg_length", d);
+            return new Metric("When_VarietyOfNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved", d);
         }
 
-        public Metric generateResults_Success_complex_rolling_avg_length_5()
+        public Metric generateResults_When_VarietyOfNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved_5()
         {
             // Create the expected result
             var d = new SortedDictionary<long, float>();
@@ -323,10 +339,10 @@ namespace transforms.Tests
             d.Add(18, 19.0F);
             d.Add(19, 20.0F);
             d.Add(20, 0.0F);
-            return new Metric("Success_complex_rolling_avg_length:RBN", d);
+            return new Metric("When_VarietyOfNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved:RBN", d);
         }
 
-        public Metric generateResults_Success_complex_rolling_avg_length_6()
+        public Metric generateResults_When_VarietyOfNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved_6()
         {
             // Create the expected result
             var d = new SortedDictionary<long, float>();
@@ -350,7 +366,7 @@ namespace transforms.Tests
             d.Add(18, 18.0F);
             d.Add(19, 19.0F);
             d.Add(20, 0.0F);
-            return new Metric("Success_complex_rolling_avg_length:RBN", d);
+            return new Metric("When_VarietyOfNoisePresentAndDefaultRollingAvgChanged_Expect_AllBaseNoiseIsRemoved:RBN", d);
         }
 
 

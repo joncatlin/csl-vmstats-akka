@@ -4,6 +4,7 @@ using Akka.TestKit.NUnit3;
 using Akka.Actor;
 using vmstats;
 using Akka.Configuration;
+using Newtonsoft.Json;
 
 namespace transforms.Tests
 {
@@ -12,7 +13,7 @@ namespace transforms.Tests
     {
         static void Main(string[] args)
         {
-            var test = new RemoveBaseNoiseTests();
+            var test = new CombineTests();
 
             // Get the configuration of the akka system
             var config = ConfigurationFactory.ParseString(GetConfiguration());
@@ -23,23 +24,26 @@ namespace transforms.Tests
             /***************************************************************************
              * Call the test to be performed
              ***************************************************************************/
-            var msg = test.generateTestData_Success_specific_rolling_avg_length();
+            var metrics = new List<Metric>();
+            metrics.Add(test.generateTestData_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_1());
+            metrics.Add(test.generateTestData_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_2());
+            metrics.Add(test.generateTestData_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_3());
 
             // Create the actor and send it the data to be transformed
             var actor = sys.ActorOf(Props.Create(() => new CombineActor()));
-            actor.Tell(msg);
+            actor.Tell(new Combine(metrics));
 
             // Wait for the actor system to terminate so we have time to debug things
             sys.WhenTerminated.Wait();
         }
 
         [Test]
-        public void Success_all_values_combined()
+        public void When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach()
         {
             var metrics = new List<Metric>();
-            metrics.Add(generateTestData_Success_all_values_combined_1());
-            metrics.Add(generateTestData_Success_all_values_combined_2());
-            metrics.Add(generateTestData_Success_all_values_combined_3());
+            metrics.Add(generateTestData_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_1());
+            metrics.Add(generateTestData_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_2());
+            metrics.Add(generateTestData_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_3());
 
             // Create the actor and send it the data to be transformed
             var actor = Sys.ActorOf(Props.Create(() => new CombineActor()));
@@ -47,14 +51,17 @@ namespace transforms.Tests
             var result = ExpectMsg<Result>();
 
             // Create the expected results
-            var expectedResults = generateResults_Success_all_values_combined();
+            var expectedResult = generateResults_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach();
 
             // Check expected results match real results
-            Assert.AreEqual(expectedResults.Values, result.Measurements.Values);
-            Assert.AreEqual(expectedResults.Name, result.Measurements.Name);
+            CollectionAssert.AreEqual(expectedResult.Values, result.Measurements.Values,
+                "Resuls and Expected values are different.\nExpected values = {0}\nActual result values = {1}. ",
+                new object[] { JsonConvert.SerializeObject(expectedResult.Values), JsonConvert.SerializeObject(result.Measurements.Values) }
+                );
+            Assert.AreEqual(expectedResult.Name, result.Measurements.Name);
         }
 
-        public Metric generateTestData_Success_all_values_combined_1()
+        public Metric generateTestData_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_1()
         {
             // Create the data for the test
             var d = new SortedDictionary<long, float>();
@@ -78,10 +85,10 @@ namespace transforms.Tests
             d.Add(18, 1.0F);
             d.Add(19, 1.0F);
             d.Add(20, 1.0F);
-            return new Metric("Success_all_values_combined_1", d);
+            return new Metric("When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_1", d);
         }
 
-        public Metric generateTestData_Success_all_values_combined_2()
+        public Metric generateTestData_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_2()
         {
             // Create the data for the test
             var d = new SortedDictionary<long, float>();
@@ -105,10 +112,10 @@ namespace transforms.Tests
             d.Add(18, 1.0F);
             d.Add(19, 1.0F);
             d.Add(20, 1.0F);
-            return new Metric("Success_all_values_combined_2", d);
+            return new Metric("When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_2", d);
         }
 
-        public Metric generateTestData_Success_all_values_combined_3()
+        public Metric generateTestData_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_3()
         {
             // Create the data for the test
             var d = new SortedDictionary<long, float>();
@@ -132,10 +139,10 @@ namespace transforms.Tests
             d.Add(18, 8.0F);
             d.Add(19, 8.0F);
             d.Add(20, 8.0F);
-            return new Metric("Success_all_values_combined_3", d);
+            return new Metric("When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_3", d);
         }
 
-        public Metric generateResults_Success_all_values_combined()
+        public Metric generateResults_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach()
         {
             // Create the data for the expected result
             var d = new SortedDictionary<long, float>();
@@ -160,7 +167,7 @@ namespace transforms.Tests
             d.Add(19, 10.0F);
             d.Add(20, 10.0F);
 
-            return new Metric("(Success_all_values_combined_1:Success_all_values_combined_2:Success_all_values_combined_3):COM", d);
+            return new Metric("(When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_1+When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_2+When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_3):COM", d);
         }
 
         private static string GetConfiguration()
