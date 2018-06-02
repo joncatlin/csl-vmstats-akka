@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 
 namespace vmstats.lang
 {
@@ -13,7 +14,7 @@ namespace vmstats.lang
             {
                 string input = "";
                 StringBuilder text = new StringBuilder();
-                Console.WriteLine("The grammer to be parsed");
+                Console.WriteLine("The grammer to be parsed:");
 
                 // to type the EOF character and end the input: use CTRL+D, then press <enter>     
                 /*
@@ -22,15 +23,55 @@ namespace vmstats.lang
                                     text.AppendLine(input);
                                 }
                 */
-                input = Console.ReadLine();
+                text.AppendLine(Console.ReadLine());
 
                 AntlrInputStream inputStream = new AntlrInputStream(text.ToString());
 
-                VmstatsLexer myLexer = new VmstatsLexer(inputStream);
-                CommonTokenStream commonTokenStream = new CommonTokenStream(myLexer);
-                VmstatsParser myParser = new VmstatsParser(commonTokenStream);
+                // Get the lexer for the language
+                VmstatsLexer lexer = new VmstatsLexer(inputStream);
 
-                VmstatsParser.Transform_pipelineContext transform_pipelineContext = myParser.transform_pipeline();
+                // Get a list of matched tokens 
+                CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+                // Pass the tokens to the parser
+                VmstatsParser parser = new VmstatsParser(tokens);
+
+                // Specify the entry point to the stream of tokens
+                VmstatsParser.Transform_pipelineContext context = parser.transform_pipeline();
+
+                // Create an instance of our listener class to be called as we walk the language
+                MyListener myListener = new MyListener();
+
+                ParseTreeWalker walker = new ParseTreeWalker();
+
+//                parser.BuildParseTree = true;
+                walker.Walk(myListener, context);
+                //                IParseTree tree = parser.
+
+
+
+/*
+                parser.pro
+                Transform_PipelineTreeWalker 
+                    
+                    walker = new transform_PipelineWalker();
+
+//                AntlrInputStream inputStream = new AntlrInputStream(fileStream);
+//                ValuesLexer lexer = new ValuesLexer(inputStream);
+//                CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+//                ValuesParser parser = new ValuesParser(tokenStream);
+//                ValuesParser.ParseContext context = parser.parse();
+//                ValuesListener listener = new ValuesListener();
+                ParseTreeWalker walker = new ParseTreeWalker();
+                bool built = parser.BuildParseTree;
+                walker.Walk(listener, context);
+                foreach (double d in listener.doubles)
+                    Console.WriteLine(d);
+                Console.ReadKey();
+
+                ParseTreeWalker walker = new ParseTreeWalker();
+                AntlrDrinkListener listener = new AntlrDrinkListener();
+                walker.walk(listener, drinkSentenceContext);
 
                 int i = 0;
 /*
@@ -49,10 +90,4 @@ namespace vmstats.lang
             }
         }
     }
-/*
-    public class MyVisitor : VmstatsBaseVisitor<object>
-    {
-        public List<VisitTransform_pipeline>
-    }
-*/
 }
