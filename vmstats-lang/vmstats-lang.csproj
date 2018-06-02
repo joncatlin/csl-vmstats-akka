@@ -2,14 +2,27 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject>vmstats.lang.Start</StartupObject>
   </PropertyGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="java -jar antlr-4.7.1-complete.jar -Dlanguage=CSharp Language.g4" />
-  </Target>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>2</WarningLevel>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.7.1.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="vmstats.g4">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="java -jar antlr-4.7.1-complete.jar -Dlanguage=CSharp -visitor vmstats.g4" />
+  </Target>
 
 </Project>
