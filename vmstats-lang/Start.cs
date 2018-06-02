@@ -26,11 +26,11 @@ namespace vmstats.lang
 
                 AntlrInputStream inputStream = new AntlrInputStream(text.ToString());
 
-                vmstatsLexer myLexer = new vmstatsLexer(inputStream);
+                VmstatsLexer myLexer = new VmstatsLexer(inputStream);
                 CommonTokenStream commonTokenStream = new CommonTokenStream(myLexer);
-                vmstatsParser myParser = new vmstatsParser(commonTokenStream);
+                VmstatsParser myParser = new VmstatsParser(commonTokenStream);
 
-                vmstatsParser.Transform_pipelineContext transform_pipelineContext = myParser.transform_pipeline();
+                VmstatsParser.Transform_pipelineContext transform_pipelineContext = myParser.transform_pipeline();
 
                 int i = 0;
 /*
@@ -49,10 +49,10 @@ namespace vmstats.lang
             }
         }
     }
-
-
-    public class MyVisitor : vmstatsBaseVisitor<object>
+/*
+    public class MyVisitor : VmstatsBaseVisitor<object>
     {
         public List<VisitTransform_pipeline>
     }
+*/
 }

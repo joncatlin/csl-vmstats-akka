@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from vmstats.g4 by ANTLR 4.7.1
+// Generated from Vmstats.g4 by ANTLR 4.7.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -25,16 +25,16 @@ using IToken = Antlr4.Runtime.IToken;
 using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 /// <summary>
-/// This class provides an empty implementation of <see cref="IvmstatsVisitor{Result}"/>,
+/// This class provides an empty implementation of <see cref="IVmstatsVisitor{Result}"/>,
 /// which can be extended to create a visitor which only needs to handle a subset
 /// of the available methods.
 /// </summary>
 /// <typeparam name="Result">The return type of the visit operation.</typeparam>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.7.1")]
 [System.CLSCompliant(false)]
-public partial class vmstatsBaseVisitor<Result> : AbstractParseTreeVisitor<Result>, IvmstatsVisitor<Result> {
+public partial class VmstatsBaseVisitor<Result> : AbstractParseTreeVisitor<Result>, IVmstatsVisitor<Result> {
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.transform_pipeline"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.transform_pipeline"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -42,9 +42,9 @@ public partial class vmstatsBaseVisitor<Result> : AbstractParseTreeVisitor<Resul
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitTransform_pipeline([NotNull] vmstatsParser.Transform_pipelineContext context) { return VisitChildren(context); }
+	public virtual Result VisitTransform_pipeline([NotNull] VmstatsParser.Transform_pipelineContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.transform"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.transform"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -52,9 +52,9 @@ public partial class vmstatsBaseVisitor<Result> : AbstractParseTreeVisitor<Resul
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitTransform([NotNull] vmstatsParser.TransformContext context) { return VisitChildren(context); }
+	public virtual Result VisitTransform([NotNull] VmstatsParser.TransformContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.parameter"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.parameter"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -62,9 +62,9 @@ public partial class vmstatsBaseVisitor<Result> : AbstractParseTreeVisitor<Resul
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitParameter([NotNull] vmstatsParser.ParameterContext context) { return VisitChildren(context); }
+	public virtual Result VisitParameter([NotNull] VmstatsParser.ParameterContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.combine"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.combine"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -72,9 +72,9 @@ public partial class vmstatsBaseVisitor<Result> : AbstractParseTreeVisitor<Resul
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitCombine([NotNull] vmstatsParser.CombineContext context) { return VisitChildren(context); }
+	public virtual Result VisitCombine([NotNull] VmstatsParser.CombineContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.metric_name"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.metric_name"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -82,9 +82,9 @@ public partial class vmstatsBaseVisitor<Result> : AbstractParseTreeVisitor<Resul
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitMetric_name([NotNull] vmstatsParser.Metric_nameContext context) { return VisitChildren(context); }
+	public virtual Result VisitMetric_name([NotNull] VmstatsParser.Metric_nameContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.transform_name"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.transform_name"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -92,9 +92,9 @@ public partial class vmstatsBaseVisitor<Result> : AbstractParseTreeVisitor<Resul
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitTransform_name([NotNull] vmstatsParser.Transform_nameContext context) { return VisitChildren(context); }
+	public virtual Result VisitTransform_name([NotNull] VmstatsParser.Transform_nameContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.parameter_name"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.parameter_name"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -102,9 +102,9 @@ public partial class vmstatsBaseVisitor<Result> : AbstractParseTreeVisitor<Resul
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitParameter_name([NotNull] vmstatsParser.Parameter_nameContext context) { return VisitChildren(context); }
+	public virtual Result VisitParameter_name([NotNull] VmstatsParser.Parameter_nameContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.value_name"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.value_name"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -112,5 +112,5 @@ public partial class vmstatsBaseVisitor<Result> : AbstractParseTreeVisitor<Resul
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitValue_name([NotNull] vmstatsParser.Value_nameContext context) { return VisitChildren(context); }
+	public virtual Result VisitValue_name([NotNull] VmstatsParser.Value_nameContext context) { return VisitChildren(context); }
 }

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from vmstats.g4 by ANTLR 4.7.1
+// Generated from Vmstats.g4 by ANTLR 4.7.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -25,58 +25,58 @@ using IToken = Antlr4.Runtime.IToken;
 
 /// <summary>
 /// This interface defines a complete generic visitor for a parse tree produced
-/// by <see cref="vmstatsParser"/>.
+/// by <see cref="VmstatsParser"/>.
 /// </summary>
 /// <typeparam name="Result">The return type of the visit operation.</typeparam>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.7.1")]
 [System.CLSCompliant(false)]
-public interface IvmstatsVisitor<Result> : IParseTreeVisitor<Result> {
+public interface IVmstatsVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.transform_pipeline"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.transform_pipeline"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitTransform_pipeline([NotNull] vmstatsParser.Transform_pipelineContext context);
+	Result VisitTransform_pipeline([NotNull] VmstatsParser.Transform_pipelineContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.transform"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.transform"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitTransform([NotNull] vmstatsParser.TransformContext context);
+	Result VisitTransform([NotNull] VmstatsParser.TransformContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.parameter"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.parameter"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitParameter([NotNull] vmstatsParser.ParameterContext context);
+	Result VisitParameter([NotNull] VmstatsParser.ParameterContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.combine"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.combine"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitCombine([NotNull] vmstatsParser.CombineContext context);
+	Result VisitCombine([NotNull] VmstatsParser.CombineContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.metric_name"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.metric_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitMetric_name([NotNull] vmstatsParser.Metric_nameContext context);
+	Result VisitMetric_name([NotNull] VmstatsParser.Metric_nameContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.transform_name"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.transform_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitTransform_name([NotNull] vmstatsParser.Transform_nameContext context);
+	Result VisitTransform_name([NotNull] VmstatsParser.Transform_nameContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.parameter_name"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.parameter_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitParameter_name([NotNull] vmstatsParser.Parameter_nameContext context);
+	Result VisitParameter_name([NotNull] VmstatsParser.Parameter_nameContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="vmstatsParser.value_name"/>.
+	/// Visit a parse tree produced by <see cref="VmstatsParser.value_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitValue_name([NotNull] vmstatsParser.Value_nameContext context);
+	Result VisitValue_name([NotNull] VmstatsParser.Value_nameContext context);
 }

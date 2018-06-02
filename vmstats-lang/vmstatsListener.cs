@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from vmstats.g4 by ANTLR 4.7.1
+// Generated from Vmstats.g4 by ANTLR 4.7.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -25,89 +25,89 @@ using IToken = Antlr4.Runtime.IToken;
 
 /// <summary>
 /// This interface defines a complete listener for a parse tree produced by
-/// <see cref="vmstatsParser"/>.
+/// <see cref="VmstatsParser"/>.
 /// </summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.7.1")]
 [System.CLSCompliant(false)]
-public interface IvmstatsListener : IParseTreeListener {
+public interface IVmstatsListener : IParseTreeListener {
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.transform_pipeline"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.transform_pipeline"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterTransform_pipeline([NotNull] vmstatsParser.Transform_pipelineContext context);
+	void EnterTransform_pipeline([NotNull] VmstatsParser.Transform_pipelineContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.transform_pipeline"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.transform_pipeline"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitTransform_pipeline([NotNull] vmstatsParser.Transform_pipelineContext context);
+	void ExitTransform_pipeline([NotNull] VmstatsParser.Transform_pipelineContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.transform"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.transform"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterTransform([NotNull] vmstatsParser.TransformContext context);
+	void EnterTransform([NotNull] VmstatsParser.TransformContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.transform"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.transform"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitTransform([NotNull] vmstatsParser.TransformContext context);
+	void ExitTransform([NotNull] VmstatsParser.TransformContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.parameter"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.parameter"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterParameter([NotNull] vmstatsParser.ParameterContext context);
+	void EnterParameter([NotNull] VmstatsParser.ParameterContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.parameter"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.parameter"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitParameter([NotNull] vmstatsParser.ParameterContext context);
+	void ExitParameter([NotNull] VmstatsParser.ParameterContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.combine"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.combine"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterCombine([NotNull] vmstatsParser.CombineContext context);
+	void EnterCombine([NotNull] VmstatsParser.CombineContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.combine"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.combine"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitCombine([NotNull] vmstatsParser.CombineContext context);
+	void ExitCombine([NotNull] VmstatsParser.CombineContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.metric_name"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.metric_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterMetric_name([NotNull] vmstatsParser.Metric_nameContext context);
+	void EnterMetric_name([NotNull] VmstatsParser.Metric_nameContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.metric_name"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.metric_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitMetric_name([NotNull] vmstatsParser.Metric_nameContext context);
+	void ExitMetric_name([NotNull] VmstatsParser.Metric_nameContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.transform_name"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.transform_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterTransform_name([NotNull] vmstatsParser.Transform_nameContext context);
+	void EnterTransform_name([NotNull] VmstatsParser.Transform_nameContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.transform_name"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.transform_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitTransform_name([NotNull] vmstatsParser.Transform_nameContext context);
+	void ExitTransform_name([NotNull] VmstatsParser.Transform_nameContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.parameter_name"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.parameter_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterParameter_name([NotNull] vmstatsParser.Parameter_nameContext context);
+	void EnterParameter_name([NotNull] VmstatsParser.Parameter_nameContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.parameter_name"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.parameter_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitParameter_name([NotNull] vmstatsParser.Parameter_nameContext context);
+	void ExitParameter_name([NotNull] VmstatsParser.Parameter_nameContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.value_name"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.value_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterValue_name([NotNull] vmstatsParser.Value_nameContext context);
+	void EnterValue_name([NotNull] VmstatsParser.Value_nameContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.value_name"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.value_name"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitValue_name([NotNull] vmstatsParser.Value_nameContext context);
+	void ExitValue_name([NotNull] VmstatsParser.Value_nameContext context);
 }

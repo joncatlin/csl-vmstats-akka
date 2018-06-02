@@ -16,13 +16,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="vmstats.g4">
+    <None Update="Vmstats.g4">
       <Generator>MSBuild:Compile</Generator>
     </None>
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="java -jar antlr-4.7.1-complete.jar -Dlanguage=CSharp -visitor vmstats.g4" />
+    <Exec Command="java -jar antlr-4.7.1-complete.jar -Dlanguage=CSharp -visitor Vmstats.g4" />
   </Target>
 
 </Project>

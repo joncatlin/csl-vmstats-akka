@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from vmstats.g4 by ANTLR 4.7.1
+// Generated from Vmstats.g4 by ANTLR 4.7.1
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -27,109 +27,109 @@ using IToken = Antlr4.Runtime.IToken;
 using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 
 /// <summary>
-/// This class provides an empty implementation of <see cref="IvmstatsListener"/>,
+/// This class provides an empty implementation of <see cref="IVmstatsListener"/>,
 /// which can be extended to create a listener which only needs to handle a subset
 /// of the available methods.
 /// </summary>
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.7.1")]
 [System.CLSCompliant(false)]
-public partial class vmstatsBaseListener : IvmstatsListener {
+public partial class VmstatsBaseListener : IVmstatsListener {
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.transform_pipeline"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.transform_pipeline"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterTransform_pipeline([NotNull] vmstatsParser.Transform_pipelineContext context) { }
+	public virtual void EnterTransform_pipeline([NotNull] VmstatsParser.Transform_pipelineContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.transform_pipeline"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.transform_pipeline"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitTransform_pipeline([NotNull] vmstatsParser.Transform_pipelineContext context) { }
+	public virtual void ExitTransform_pipeline([NotNull] VmstatsParser.Transform_pipelineContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.transform"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.transform"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterTransform([NotNull] vmstatsParser.TransformContext context) { }
+	public virtual void EnterTransform([NotNull] VmstatsParser.TransformContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.transform"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.transform"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitTransform([NotNull] vmstatsParser.TransformContext context) { }
+	public virtual void ExitTransform([NotNull] VmstatsParser.TransformContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.parameter"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.parameter"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterParameter([NotNull] vmstatsParser.ParameterContext context) { }
+	public virtual void EnterParameter([NotNull] VmstatsParser.ParameterContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.parameter"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.parameter"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitParameter([NotNull] vmstatsParser.ParameterContext context) { }
+	public virtual void ExitParameter([NotNull] VmstatsParser.ParameterContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.combine"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.combine"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterCombine([NotNull] vmstatsParser.CombineContext context) { }
+	public virtual void EnterCombine([NotNull] VmstatsParser.CombineContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.combine"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.combine"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitCombine([NotNull] vmstatsParser.CombineContext context) { }
+	public virtual void ExitCombine([NotNull] VmstatsParser.CombineContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.metric_name"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.metric_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterMetric_name([NotNull] vmstatsParser.Metric_nameContext context) { }
+	public virtual void EnterMetric_name([NotNull] VmstatsParser.Metric_nameContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.metric_name"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.metric_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitMetric_name([NotNull] vmstatsParser.Metric_nameContext context) { }
+	public virtual void ExitMetric_name([NotNull] VmstatsParser.Metric_nameContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.transform_name"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.transform_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterTransform_name([NotNull] vmstatsParser.Transform_nameContext context) { }
+	public virtual void EnterTransform_name([NotNull] VmstatsParser.Transform_nameContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.transform_name"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.transform_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitTransform_name([NotNull] vmstatsParser.Transform_nameContext context) { }
+	public virtual void ExitTransform_name([NotNull] VmstatsParser.Transform_nameContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.parameter_name"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.parameter_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterParameter_name([NotNull] vmstatsParser.Parameter_nameContext context) { }
+	public virtual void EnterParameter_name([NotNull] VmstatsParser.Parameter_nameContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.parameter_name"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.parameter_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitParameter_name([NotNull] vmstatsParser.Parameter_nameContext context) { }
+	public virtual void ExitParameter_name([NotNull] VmstatsParser.Parameter_nameContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="vmstatsParser.value_name"/>.
+	/// Enter a parse tree produced by <see cref="VmstatsParser.value_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterValue_name([NotNull] vmstatsParser.Value_nameContext context) { }
+	public virtual void EnterValue_name([NotNull] VmstatsParser.Value_nameContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="vmstatsParser.value_name"/>.
+	/// Exit a parse tree produced by <see cref="VmstatsParser.value_name"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitValue_name([NotNull] vmstatsParser.Value_nameContext context) { }
+	public virtual void ExitValue_name([NotNull] VmstatsParser.Value_nameContext context) { }
 
 	/// <inheritdoc/>
 	/// <remarks>The default implementation does nothing.</remarks>
