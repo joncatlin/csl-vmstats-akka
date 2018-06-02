@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\transforms\transforms.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Vmstats.g4">
       <Generator>MSBuild:Compile</Generator>
     </None>

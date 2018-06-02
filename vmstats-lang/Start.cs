@@ -12,20 +12,13 @@ namespace vmstats.lang
         {
             try
             {
-                string input = "";
-                StringBuilder text = new StringBuilder();
-                Console.WriteLine("The grammer to be parsed:");
+                string complexTransformationPipeline = "( CPUMAX->RBN:RSP{param1=value1} + MEMMAX->RBN:RSP{param2=value2,param3=value3} + IOMAX->RBN:RSP ) : RBN {param4=value4}";
+                string simpleTransformationPipeline = "CPUMAX->RBN:RSP{param1=value1}";
+                string input = simpleTransformationPipeline;
+                Console.WriteLine(input);
 
-                // to type the EOF character and end the input: use CTRL+D, then press <enter>     
-                /*
-                                while ((input = Console.ReadLine()) != "\u0004")
-                                {
-                                    text.AppendLine(input);
-                                }
-                */
-                text.AppendLine(Console.ReadLine());
-
-                AntlrInputStream inputStream = new AntlrInputStream(text.ToString());
+                // Create an ANTLR input stream to process the DSL entered
+                AntlrInputStream inputStream = new AntlrInputStream(input);
 
                 // Get the lexer for the language
                 VmstatsLexer lexer = new VmstatsLexer(inputStream);
@@ -40,49 +33,17 @@ namespace vmstats.lang
                 VmstatsParser.Transform_pipelineContext context = parser.transform_pipeline();
 
                 // Create an instance of our listener class to be called as we walk the language
-                MyListener myListener = new MyListener();
+                MyListener myListener = new MyListener(null);
 
+                // Create a tree walker to walk the AST
                 ParseTreeWalker walker = new ParseTreeWalker();
 
-//                parser.BuildParseTree = true;
+                // Now walk the AST having the listener be called during all the events
                 walker.Walk(myListener, context);
-                //                IParseTree tree = parser.
 
 
-
-/*
-                parser.pro
-                Transform_PipelineTreeWalker 
-                    
-                    walker = new transform_PipelineWalker();
-
-//                AntlrInputStream inputStream = new AntlrInputStream(fileStream);
-//                ValuesLexer lexer = new ValuesLexer(inputStream);
-//                CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-//                ValuesParser parser = new ValuesParser(tokenStream);
-//                ValuesParser.ParseContext context = parser.parse();
-//                ValuesListener listener = new ValuesListener();
-                ParseTreeWalker walker = new ParseTreeWalker();
-                bool built = parser.BuildParseTree;
-                walker.Walk(listener, context);
-                foreach (double d in listener.doubles)
-                    Console.WriteLine(d);
+                // Wait until key pressed in order to analyze the results
                 Console.ReadKey();
-
-                ParseTreeWalker walker = new ParseTreeWalker();
-                AntlrDrinkListener listener = new AntlrDrinkListener();
-                walker.walk(listener, drinkSentenceContext);
-
-                int i = 0;
-/*
-                myParser.StatementContext context = myParser.statement();
-                LanguageVisitor visitor = new LanguageVisitor();
-                visitor.Visit(context);
-                foreach (var line in visitor.Lines)
-                {
-                    Console.WriteLine("{0} has said \"{1}\"", line.Person, line.Text);
-                }
-*/
             }
             catch (Exception ex)
             {
