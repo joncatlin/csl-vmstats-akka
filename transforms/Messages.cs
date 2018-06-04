@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Akka.Actor;
 using Akka.Event;
+using Akka.Routing;
 using vmstats;
 
 namespace transforms
@@ -9,61 +10,52 @@ namespace transforms
     #region Message classes
 
     /// <summary>
-    /// This class holds a metric that is to be transformed, The transformation 
-    /// can be supplied with or without parameters to override the default transformation
-    /// parameters.
+    /// This class holds a single transform, comprisiong a name and optionally some parameters
+    /// The transformation can be supplied with or without parameters to override the default 
+    /// settings within the transformation actor.
     /// </summary>
     public class Transform
     {
-        public Transform(Metric metric, Dictionary<string, string>paramaters)
+        public Transform(string name, Dictionary<string, string>paramaters)
         {
-            Measurements = metric;
+            Name = name;
             Parameters = paramaters;
         }
 
-        public Transform(Metric metric)
+        public Transform(string name)
         {
-            Measurements = metric;
+            Name = name;
             Parameters = new Dictionary<string, string>();
         }
 
-        public Metric Measurements { get; set; }
+        public string Name { get; set; }
         public Dictionary<string, string> Parameters { get; set; }
     }
 
     /// <summary>
-    /// This class holds a series of transforms to be calculated on a single Metric.
+    /// This class holds a single Metric and a series of Transforms to be performed upon it. It also
+    /// contains a unique ID so that if a transform actor is part of a consistent hashing routing group
+    /// then all the transforms for this particular transform series will be routed to the same actor.
+    /// 
+    /// This is required in order for the Combine transform to work properly
     /// </summary>
-    public class TransformSeries
+    public class TransformSeries : IConsistentHashable
     {
-        public TransformSeries(Metric metric, Stack<string>transformNames)
+        public TransformSeries(Metric metric, Stack<Transform> transforms, Guid groupID)
         {
             Measurements = metric;
-            TransformNames = transformNames;
-        }
-
-        public Metric Measurements { get; }
-        public Stack<string> TransformNames { get; }
-    }
-
-    /// <summary>
-    /// This class holds a series of transforms to be calculated on a group of different 
-    /// Metrics. It specifies which transform to perform on which Metric.
-    /// 
-    /// TODO. This is a starting mechanism only. It really needs a tree structure for the
-    /// potential complex ways that transforms can be calculated and then combined. So starting
-    /// this is a simple implementation.
-    /// </summary>
-    public class TransformSeriesGroup
-    {
-        public TransformSeriesGroup(List<TransformSeries> transforms)
-        {
             Transforms = transforms;
+            GroupID = groupID;
         }
 
-        public List<TransformSeries> Transforms { get; }
+        public Guid GroupID { get; private set; }
+        public object ConsistentHashKey { get { return GroupID; } }
+
+        public Metric Measurements { get; private set; }
+        public Stack<Transform> Transforms { get; private set; }
     }
 
+    /*
     /// <summary>
     /// This class holds the result of a transformation.
     /// </summary>
@@ -76,19 +68,22 @@ namespace transforms
 
         public Metric Measurements { get; set; }
     }
-
-    /// <summary>
-    /// This class holds a list of metrics that should be combined into a single metric.
-    /// </summary>
-    public class Combine
-    {
-        public Combine(List<Metric> metrics)
+*/
+    /* DO NOT USE THIS. Instead use a transform series with a specific transform containing parameters of the unique ids 
+     * of the transforms to combine
+        /// <summary>
+        /// This class holds a list of unique ids for TransformSeries that are to be combined into a single Metric
+        /// </summary>
+        public class Combine
         {
-            Metrics = metrics;
-        }
+            public Combine(List<Metric> metrics)
+            {
+                Metrics = metrics;
+            }
 
-        public List<Metric> Metrics { get; set; }
-    }
+            public List<Metric> Metrics { get; set; }
+        }
+     */
 
 
     #endregion
