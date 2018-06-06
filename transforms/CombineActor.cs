@@ -18,11 +18,12 @@ namespace transforms
 
         public CombineActor()
         {
-            Receive<Combine>(msg => Combine(msg));
+            Receive<TransformSeries>(msg => Combine(msg));
         }
 
-        private void Combine(Combine msg)
+        private void Combine(TransformSeries msg)
         {
+/*
             // Get a list of the keys from the first metric. Use this list of keys to extract
             // the values out of each metric to be combined.
             // NOTE: This means that the new Metric created will only have keys from the first Metric and
@@ -63,6 +64,7 @@ namespace transforms
             // Return the results to the caller
             var result = new Result(new Metric(sb.ToString(), combinedValues));
             Sender.Tell(result);
+*/
         }
     }
 }

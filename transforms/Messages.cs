@@ -55,6 +55,24 @@ namespace transforms
         public Stack<Transform> Transforms { get; private set; }
     }
 
+    /// <summary>
+    /// This class requests a Metric be obtained from the population of MetricStoreActors and then formed into
+    /// a TransformSeries and sent to the TransformActor population for processing.
+    /// </summary>
+    public class BuildTransformSeries
+    {
+        public BuildTransformSeries(string metricName, Stack<Transform> transforms, Guid groupID)
+        {
+            MetricName = metricName;
+            Transforms = transforms;
+            GroupID = groupID;
+        }
+
+        public Guid GroupID { get; private set; }
+        public string MetricName { get; private set; }
+        public Stack<Transform> Transforms { get; private set; }
+    }
+
     /*
     /// <summary>
     /// This class holds the result of a transformation.

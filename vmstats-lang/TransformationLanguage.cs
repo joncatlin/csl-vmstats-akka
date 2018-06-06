@@ -18,28 +18,30 @@ namespace vmstats.lang
         public TransformationLanguage (ILoggingAdapter log)
         {
             //  Save the logging context
+            _log = log;
         }
 
         private static void Main(string[] args)
         {
-            string complexTransformationPipeline = "( CPUMAX->RBN:RSP{param1=value1} + MEMMAX->RBN:RSP{param2=value2,param3=value3} + IOMAX->RBN:RSP ) : RBN {param4=value4}";
-            string simpleTransformationPipeline = "CPUMAX->RBN:RSP{param1=value1}";
-            string errorTransformationPipeline = "CPUMAX -> RBN : 'JON' {param-1=value$4}";
+            // Build a string with some of the DSL in order to test
+            string simpleTransformationPipeline = "CPUMAX->" + RemoveBaseNoiseActor.TRANSFORM_NAME + 
+                ":" + RemoveSpikeActor.TRANSFORM_NAME + "{ " + RemoveSpikeActor.SPIKE_WINDOW_LENGTH +" = 3}";
 
-            // Get the configuration of the akka system
-//            var config = ConfigurationFactory.ParseString(GetConfiguration());
+            // Build a string containing errors in the DSL
+            string errorTransformationPipeline = "CPUMAX -> RBN : 'JON' {param-1=value$4}";
 
             // Create the container for all the actors
             var sys = ActorSystem.Create("vmstats-lang-tests"/*, config*/);
 
             // Create some transform actors so that we can test the DSL
-            var actor = sys.ActorOf(Props.Create(() => new RemoveBaseNoiseActor()));
+            var actor1 = sys.ActorOf(Props.Create(() => new RemoveBaseNoiseActor()), "/Transforms/" + RemoveBaseNoiseActor.TRANSFORM_NAME);
+            var actor2 = sys.ActorOf(Props.Create(() => new RemoveSpikeActor()), "/Transforms/" + RemoveSpikeActor.TRANSFORM_NAME);
 
             // Pick one of the defined above pipelines to use in the test
             string cmd = simpleTransformationPipeline;
 
             // translate the DSL in the test text and execute the tranform pipeline it represents
-            var tp = new TransformationLanguage(null);
+            var tp = new TransformationLanguage(sys.Log);
             tp.DecodeAndExecute(cmd);
 
             // Wait for the actor system to terminate so we have time to debug things
@@ -49,6 +51,9 @@ namespace vmstats.lang
 
         public void DecodeAndExecute(string commandsToDecode)
         {
+            // Create a collection to hold all of the transform_pipelines found by the listener
+            Stack<BuildTransformSeries> series = new Stack<BuildTransformSeries>();
+
             try
             {
                 // Create an ANTLR input stream to process the DSL entered
@@ -67,7 +72,7 @@ namespace vmstats.lang
                 VmstatsParser.Transform_pipelineContext context = parser.transform_pipeline();
 
                 // Create an instance of our listener class to be called as we walk the language
-                MyListener myListener = new MyListener(_log);
+                MyListener myListener = new MyListener(_log, series);
 
                 // Create a tree walker to walk the AST
                 ParseTreeWalker walker = new ParseTreeWalker();
@@ -79,18 +84,6 @@ namespace vmstats.lang
             {
                 _log.Error("Error processing transform DSL statement. Reason: " + ex);
             }
-        }
-
-
-        public static void RouteTransform (ActorSystem sys, TransformSeries series)
-        {
-            // Get the name of the first transform in the series
-            var tname = series.Transforms.Peek().Name;
-
-            // look up the actor with the name of the transform and send the transform series 
-            // to it for the first step in the processing. Each transform actor in turn will then
-            // use this method to route to the next transform in the series.
-            sys.ActorSelection("*/Transforms/" + tname).Tell(series);
         }
     }
 }

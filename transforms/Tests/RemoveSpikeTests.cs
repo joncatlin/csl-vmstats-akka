@@ -11,6 +11,7 @@ namespace transforms.Tests
     [TestFixture] //using NUnit
     class RemoveSpikeTests : TestKit
     {
+        /*
         static void Main(string[] args)
         {
             var test = new RemoveSpikeTests();
@@ -21,9 +22,6 @@ namespace transforms.Tests
             // Create the container for all the actors
             var sys = ActorSystem.Create("vmstats-test", config);
 
-            /***************************************************************************
-             * Call the test to be performed
-             ***************************************************************************/
             var msg = test.generateTestData_When_ThereAreSomeSpikesInData_Expect_OnlySpikesSetToBase();
 
             // Create the actor and send it the data to be transformed
@@ -303,6 +301,6 @@ namespace transforms.Tests
             return config;
         }
 
-
+*/
     }
 }

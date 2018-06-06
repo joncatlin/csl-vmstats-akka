@@ -11,6 +11,7 @@ namespace transforms.Tests
     [TestFixture] //using NUnit
     class CombineTests : TestKit
     {
+/*
         static void Main(string[] args)
         {
             var test = new CombineTests();
@@ -21,9 +22,6 @@ namespace transforms.Tests
             // Create the container for all the actors
             var sys = ActorSystem.Create("vmstats-test", config);
 
-            /***************************************************************************
-             * Call the test to be performed
-             ***************************************************************************/
             var metrics = new List<Metric>();
             metrics.Add(test.generateTestData_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_1());
             metrics.Add(test.generateTestData_When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach_2());
@@ -36,7 +34,7 @@ namespace transforms.Tests
             // Wait for the actor system to terminate so we have time to debug things
             sys.WhenTerminated.Wait();
         }
-
+/*
         [Test]
         public void When_ThreeMetricsAreCombined_Expect_ResultMetricContainsSumOfEach()
         {
@@ -198,6 +196,6 @@ namespace transforms.Tests
             return config;
         }
 
-
+    */
     }
 }

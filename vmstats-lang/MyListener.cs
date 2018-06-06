@@ -18,14 +18,17 @@ namespace vmstats.lang
         private string currentParameterName;
         private string currentValue;
         private Dictionary<string, string> currentParameters;
-        //        public Transform(Metric metric, Dictionary<string, string> paramaters)
-
+        private Guid currentCombineID = Guid.NewGuid();
+        private Stack<BuildTransformSeries> series;
         private readonly ILoggingAdapter _log;
         #endregion
 
-        public MyListener(ILoggingAdapter log)
+        public MyListener(ILoggingAdapter log, Stack<BuildTransformSeries>series)
         {
             _log = log;
+
+            // Save the container for the BuildTransformSeries to be built by this listener class
+            this.series = series;
         }
 
         public override void EnterTransform_pipeline(VmstatsParser.Transform_pipelineContext context)
@@ -36,16 +39,28 @@ namespace vmstats.lang
         public override void ExitTransform_pipeline(VmstatsParser.Transform_pipelineContext context)
         {
             Console.WriteLine("ExitTransform_pipeline");
+
+            // Create a TransformSeries out of the information collected and add it to all the 
+            // transform_pipelines found so far.
+            series.Push(new BuildTransformSeries(currentMetricName, transforms, currentCombineID));
         }
 
         public override void EnterTransform(VmstatsParser.TransformContext context)
         {
             Console.WriteLine("EnterTransform");
+
+            // Reset the current transform and parameters
+            currentTransformName = "";
+            currentParameters = new Dictionary<string, string>();
         }
 
         public override void ExitTransform(VmstatsParser.TransformContext context)
         {
             Console.WriteLine("ExitTransform");
+
+            // Create a transform out of the information collected and add it to the series
+            var transform = new Transform(currentTransformName, currentParameters);
+            transforms.Push(transform);
         }
 
         public override void EnterParameter(VmstatsParser.ParameterContext context)
@@ -56,6 +71,9 @@ namespace vmstats.lang
         public override void ExitParameter(VmstatsParser.ParameterContext context)
         {
             Console.WriteLine("ExitParameter");
+
+            // Add the parameter and value to the set of current parameters
+            currentParameters.Add(currentParameterName, currentValue);
         }
 
         public override void EnterCombine(VmstatsParser.CombineContext context)

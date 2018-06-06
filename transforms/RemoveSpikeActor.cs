@@ -6,7 +6,7 @@ using vmstats;
 
 namespace transforms
 {
-    public class RemoveSpikeActor : ReceiveActor
+    public class RemoveSpikeActor : BaseTransformActor
     {
         public static readonly string SPIKE_WINDOW_LENGTH = "SPIKE_WINDOW_LENGTH";
         public static readonly int SPIKE_WINDOW_LENGTH_DEFAULT_VALUE = 1;
@@ -17,21 +17,22 @@ namespace transforms
         public static readonly string TRANSFORM_NAME = "RSP";
         public static readonly string TRANSFORM_NAME_CONCATENATOR = ":";
 
-        private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
-
         public RemoveSpikeActor()
         {
-            Receive<Transform>(msg => CalculateTransformation(msg));
+            Receive<TransformSeries>(msg => CalculateTransformation(msg));
         }
 
-        private void CalculateTransformation(Transform msg)
+        private void CalculateTransformation(TransformSeries msg)
         {
+            // Get the transform from the series
+            var transform = msg.Transforms.Pop();
+
             // Obtain any changes in the default settings
-            int spikeWindowLength = (msg.Parameters.ContainsKey(SPIKE_WINDOW_LENGTH)) ? Int32.Parse(msg.Parameters[SPIKE_WINDOW_LENGTH]) :
+            int spikeWindowLength = (transform.Parameters.ContainsKey(SPIKE_WINDOW_LENGTH)) ? Int32.Parse(transform.Parameters[SPIKE_WINDOW_LENGTH]) :
                 SPIKE_WINDOW_LENGTH_DEFAULT_VALUE;
-            int baseWindowLength = (msg.Parameters.ContainsKey(BASE_WINDOW_LENGTH)) ? Int32.Parse(msg.Parameters[BASE_WINDOW_LENGTH]) :
+            int baseWindowLength = (transform.Parameters.ContainsKey(BASE_WINDOW_LENGTH)) ? Int32.Parse(transform.Parameters[BASE_WINDOW_LENGTH]) :
                 BASE_WINDOW_LENGTH_DEFAULT_VALUE;
-            int baseValue = (msg.Parameters.ContainsKey(BASE_VALUE)) ? Int32.Parse(msg.Parameters[BASE_VALUE]) :
+            int baseValue = (transform.Parameters.ContainsKey(BASE_VALUE)) ? Int32.Parse(transform.Parameters[BASE_VALUE]) :
                 BASE_VALUE_DEFAULT_VALUE;
 
             // Scan the values for spikes that match the windows size. A spike is determined by a series of base values followed by a 
@@ -104,9 +105,9 @@ namespace transforms
             }
             var metric = new Metric(msg.Measurements.Name + TRANSFORM_NAME_CONCATENATOR + TRANSFORM_NAME, newValues);
 
-            // Return the results to the caller
-            var result = new Result(metric);
-            Sender.Tell(result);
+            // Route the new Metric to the next transform
+            var series = new TransformSeries(metric, msg.Transforms, msg.GroupID);
+            RouteTransform(series);
         }
     }
 }

@@ -6,25 +6,25 @@ using vmstats;
 
 namespace transforms
 {
-    public class RemoveBaseNoiseActor : ReceiveActor
+    public class RemoveBaseNoiseActor : BaseTransformActor
     {
         public static readonly string ROLLING_AVG_LENGTH = "ROLLING_AVG_LENGTH";
         public static readonly int ROLLING_AVG_LENGTH_DEFAULT_VALUE = 10;
         public static readonly string TRANSFORM_NAME = "RBN";
         public static readonly string TRANSFORM_NAME_CONCATENATOR = ":";
 
-        private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
-
         public RemoveBaseNoiseActor()
         {
-            Receive<Transform>(msg => CalculateTransformation(msg));
-
+            Receive<TransformSeries>(msg => CalculateTransformation(msg));
         }
 
-        private void CalculateTransformation(Transform msg)
+        private void CalculateTransformation(TransformSeries msg)
         {
+            // Get the transform from the series
+            var transform = msg.Transforms.Pop();
+
             // Calculate the rolling average and use it as the base noise level
-            int rollingAvgLength = (msg.Parameters.ContainsKey(ROLLING_AVG_LENGTH)) ? Int32.Parse(msg.Parameters[ROLLING_AVG_LENGTH]) : 
+            int rollingAvgLength = (transform.Parameters.ContainsKey(ROLLING_AVG_LENGTH)) ? Int32.Parse(transform.Parameters[ROLLING_AVG_LENGTH]) : 
                 ROLLING_AVG_LENGTH_DEFAULT_VALUE;
             int index = 0;
             float baseNoise = FindLowestRollingAvg(msg.Measurements.Values, index, rollingAvgLength);
@@ -36,10 +36,10 @@ namespace transforms
                 newValues.Add(entry.Key, Math.Max(entry.Value - baseNoise,0));
             }
 
-            // Return the results to the caller
+            // Route the new Metric to the next transform
             var metric = new Metric(msg.Measurements.Name + TRANSFORM_NAME_CONCATENATOR + TRANSFORM_NAME, newValues);
-            var result = new Result(metric);
-            Sender.Tell(result);
+            var series = new TransformSeries(metric, msg.Transforms, msg.GroupID);
+            RouteTransform(series);
         }
 
 
