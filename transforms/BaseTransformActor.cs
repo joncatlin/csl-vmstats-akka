@@ -18,7 +18,7 @@ namespace transforms
             // look up the actor with the name of the transform and send the transform series 
             // to it for the first step in the processing. Each transform actor in turn will then
             // use this method to route to the next transform in the series.
-            Context.ActorSelection("*/Transforms/" + tname).Tell(series);
+            Context.ActorSelection("**/Transforms-" + tname).Tell(series);
         }
 
     }

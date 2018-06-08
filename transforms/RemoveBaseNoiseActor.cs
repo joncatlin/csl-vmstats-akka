@@ -21,7 +21,7 @@ namespace transforms
         private void CalculateTransformation(TransformSeries msg)
         {
             // Get the transform from the series
-            var transform = msg.Transforms.Pop();
+            var transform = msg.Transforms.Dequeue();
 
             // Calculate the rolling average and use it as the base noise level
             int rollingAvgLength = (transform.Parameters.ContainsKey(ROLLING_AVG_LENGTH)) ? Int32.Parse(transform.Parameters[ROLLING_AVG_LENGTH]) : 

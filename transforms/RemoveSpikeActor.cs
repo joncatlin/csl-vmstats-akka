@@ -25,7 +25,7 @@ namespace transforms
         private void CalculateTransformation(TransformSeries msg)
         {
             // Get the transform from the series
-            var transform = msg.Transforms.Pop();
+            var transform = msg.Transforms.Dequeue();
 
             // Obtain any changes in the default settings
             int spikeWindowLength = (transform.Parameters.ContainsKey(SPIKE_WINDOW_LENGTH)) ? Int32.Parse(transform.Parameters[SPIKE_WINDOW_LENGTH]) :

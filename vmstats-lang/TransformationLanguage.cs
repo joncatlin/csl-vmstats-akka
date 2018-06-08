@@ -13,12 +13,14 @@ namespace vmstats.lang
     {
         #region Instance variables
         private readonly ILoggingAdapter _log;
+        Queue<BuildTransformSeries> Series = new Queue<BuildTransformSeries>();
         #endregion
 
-        public TransformationLanguage (ILoggingAdapter log)
+        public TransformationLanguage (ILoggingAdapter log, Queue<BuildTransformSeries> series)
         {
             //  Save the logging context
             _log = log;
+            Series = series;
         }
 
         private static void Main(string[] args)
@@ -34,14 +36,18 @@ namespace vmstats.lang
             var sys = ActorSystem.Create("vmstats-lang-tests"/*, config*/);
 
             // Create some transform actors so that we can test the DSL
-            var actor1 = sys.ActorOf(Props.Create(() => new RemoveBaseNoiseActor()), "/Transforms/" + RemoveBaseNoiseActor.TRANSFORM_NAME);
-            var actor2 = sys.ActorOf(Props.Create(() => new RemoveSpikeActor()), "/Transforms/" + RemoveSpikeActor.TRANSFORM_NAME);
+            var actor1 = sys.ActorOf(Props.Create(() => new RemoveBaseNoiseActor()), "Transforms-" + RemoveBaseNoiseActor.TRANSFORM_NAME);
+            var actor2 = sys.ActorOf(Props.Create(() => new RemoveSpikeActor()), "Transforms-" + RemoveSpikeActor.TRANSFORM_NAME);
 
             // Pick one of the defined above pipelines to use in the test
             string cmd = simpleTransformationPipeline;
 
+            // Create a collection to hold all of the transform_pipelines found by the listener when we
+            // decode the DSL.
+            Queue<BuildTransformSeries> series = new Queue<BuildTransformSeries>();
+
             // translate the DSL in the test text and execute the tranform pipeline it represents
-            var tp = new TransformationLanguage(sys.Log);
+            var tp = new TransformationLanguage(sys.Log, series);
             tp.DecodeAndExecute(cmd);
 
             // Wait for the actor system to terminate so we have time to debug things
@@ -51,9 +57,6 @@ namespace vmstats.lang
 
         public void DecodeAndExecute(string commandsToDecode)
         {
-            // Create a collection to hold all of the transform_pipelines found by the listener
-            Stack<BuildTransformSeries> series = new Stack<BuildTransformSeries>();
-
             try
             {
                 // Create an ANTLR input stream to process the DSL entered
@@ -72,7 +75,7 @@ namespace vmstats.lang
                 VmstatsParser.Transform_pipelineContext context = parser.transform_pipeline();
 
                 // Create an instance of our listener class to be called as we walk the language
-                MyListener myListener = new MyListener(_log, series);
+                MyListener myListener = new MyListener(_log, Series);
 
                 // Create a tree walker to walk the AST
                 ParseTreeWalker walker = new ParseTreeWalker();
@@ -80,7 +83,7 @@ namespace vmstats.lang
                 // Now walk the AST having the listener be called during all the events
                 walker.Walk(myListener, context);
             }
-            catch (Exception ex)
+            catch (RecognitionException ex)
             {
                 _log.Error("Error processing transform DSL statement. Reason: " + ex);
             }

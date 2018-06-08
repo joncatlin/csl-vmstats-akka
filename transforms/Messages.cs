@@ -41,7 +41,7 @@ namespace transforms
     /// </summary>
     public class TransformSeries : IConsistentHashable
     {
-        public TransformSeries(Metric metric, Stack<Transform> transforms, Guid groupID)
+        public TransformSeries(Metric metric, Queue<Transform> transforms, Guid groupID)
         {
             Measurements = metric;
             Transforms = transforms;
@@ -52,7 +52,7 @@ namespace transforms
         public object ConsistentHashKey { get { return GroupID; } }
 
         public Metric Measurements { get; private set; }
-        public Stack<Transform> Transforms { get; private set; }
+        public Queue<Transform> Transforms { get; private set; }
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ namespace transforms
     /// </summary>
     public class BuildTransformSeries
     {
-        public BuildTransformSeries(string metricName, Stack<Transform> transforms, Guid groupID)
+        public BuildTransformSeries(string metricName, Queue<Transform> transforms, Guid groupID)
         {
             MetricName = metricName;
             Transforms = transforms;
@@ -70,7 +70,7 @@ namespace transforms
 
         public Guid GroupID { get; private set; }
         public string MetricName { get; private set; }
-        public Stack<Transform> Transforms { get; private set; }
+        public Queue<Transform> Transforms { get; private set; }
     }
 
     /*

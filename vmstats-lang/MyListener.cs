@@ -10,7 +10,7 @@ namespace vmstats.lang
     public class MyListener : VmstatsBaseListener
     {
         #region Instance variables
-        private Stack<Transform> transforms = new Stack<Transform>();
+        private Queue<Transform> transforms = new Queue<Transform>();
         private Transform currentTransform;
         private Metric currentMetric;
         private string currentMetricName;
@@ -19,11 +19,11 @@ namespace vmstats.lang
         private string currentValue;
         private Dictionary<string, string> currentParameters;
         private Guid currentCombineID = Guid.NewGuid();
-        private Stack<BuildTransformSeries> series;
+        private Queue<BuildTransformSeries> series;
         private readonly ILoggingAdapter _log;
         #endregion
 
-        public MyListener(ILoggingAdapter log, Stack<BuildTransformSeries>series)
+        public MyListener(ILoggingAdapter log, Queue<BuildTransformSeries>series)
         {
             _log = log;
 
@@ -42,7 +42,7 @@ namespace vmstats.lang
 
             // Create a TransformSeries out of the information collected and add it to all the 
             // transform_pipelines found so far.
-            series.Push(new BuildTransformSeries(currentMetricName, transforms, currentCombineID));
+            series.Enqueue(new BuildTransformSeries(currentMetricName, transforms, currentCombineID));
         }
 
         public override void EnterTransform(VmstatsParser.TransformContext context)
@@ -60,7 +60,7 @@ namespace vmstats.lang
 
             // Create a transform out of the information collected and add it to the series
             var transform = new Transform(currentTransformName, currentParameters);
-            transforms.Push(transform);
+            transforms.Enqueue(transform);
         }
 
         public override void EnterParameter(VmstatsParser.ParameterContext context)
@@ -71,9 +71,6 @@ namespace vmstats.lang
         public override void ExitParameter(VmstatsParser.ParameterContext context)
         {
             Console.WriteLine("ExitParameter");
-
-            // Add the parameter and value to the set of current parameters
-            currentParameters.Add(currentParameterName, currentValue);
         }
 
         public override void EnterCombine(VmstatsParser.CombineContext context)

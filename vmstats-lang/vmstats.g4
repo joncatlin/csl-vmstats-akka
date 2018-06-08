@@ -15,5 +15,5 @@ value_name			: ID ;
 /*
  * Lexer Rules
  */
-ID					: ([a-z] | [A-Z] | [0-9])+;
+ID					: ([a-z] | [A-Z] | [0-9] | '_')+;
 WHITESPACE          : (' ' | '\t' | '\r' | '\n')+ -> skip;
