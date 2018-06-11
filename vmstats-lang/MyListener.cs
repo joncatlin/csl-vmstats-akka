@@ -4,6 +4,7 @@ using System.Text;
 using vmstats;
 using transforms;
 using Akka.Event;
+using Antlr4.Runtime.Tree;
 
 namespace vmstats.lang
 {
@@ -21,6 +22,8 @@ namespace vmstats.lang
         private Guid currentCombineID = Guid.NewGuid();
         private Queue<BuildTransformSeries> series;
         private readonly ILoggingAdapter _log;
+        private bool _errorFound = false;
+
         #endregion
 
         public MyListener(ILoggingAdapter log, Queue<BuildTransformSeries>series)
@@ -142,6 +145,16 @@ namespace vmstats.lang
                 _log.Error("Error in DSL for transform name - {0}. Trying to add parameter with name={1} and value={2}."
                     + "Likely cause parameter with same name already exists for transform.", currentTransformName, currentParameterName, currentValue);
             }
+        }
+
+        /*
+         * THIS IS A MASSIVE HACK!!!!!!
+         * For some reason none of the error handling seems to get called and hence cannot find a way to throw an exception when the grammer
+         * being parsed is rubbish. This code will signal an error by setting a flag in the object returned
+         */
+        public override void VisitErrorNode(IErrorNode node)
+        {
+            throw new VmstatsLangException("Invalid Expression:");
         }
     }
 }

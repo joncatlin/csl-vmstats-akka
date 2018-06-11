@@ -3,7 +3,7 @@ grammar Vmstats;
 /*
  * Parser rules
  */
-transform_pipeline	: metric_name '->' transform (':' transform)* | combine ;
+transform_pipeline	: metric_name '->' transform (':' transform)* EOF | combine EOF;
 transform			: transform_name ('{' parameter (',' parameter)? '}')? ; 
 parameter			: parameter_name '=' value_name ;
 combine				: '(' transform_pipeline '+' transform_pipeline ('+' transform_pipeline)* ')' ;

@@ -5,6 +5,7 @@ using Akka.Actor;
 using Akka.Event;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using Newtonsoft.Json;
 using transforms;
 
 namespace vmstats.lang
@@ -13,16 +14,15 @@ namespace vmstats.lang
     {
         #region Instance variables
         private readonly ILoggingAdapter _log;
-        Queue<BuildTransformSeries> Series = new Queue<BuildTransformSeries>();
         #endregion
 
-        public TransformationLanguage (ILoggingAdapter log, Queue<BuildTransformSeries> series)
+        public TransformationLanguage (ILoggingAdapter log)
         {
             //  Save the logging context
             _log = log;
-            Series = series;
         }
 
+        /*
         private static void Main(string[] args)
         {
             // Build a string with some of the DSL in order to test
@@ -33,7 +33,7 @@ namespace vmstats.lang
             string errorTransformationPipeline = "CPUMAX -> RBN : 'JON' {param-1=value$4}";
 
             // Create the container for all the actors
-            var sys = ActorSystem.Create("vmstats-lang-tests"/*, config*/);
+            var sys = ActorSystem.Create("vmstats-lang-tests", config);
 
             // Create some transform actors so that we can test the DSL
             var actor1 = sys.ActorOf(Props.Create(() => new RemoveBaseNoiseActor()), "Transforms-" + RemoveBaseNoiseActor.TRANSFORM_NAME);
@@ -53,12 +53,14 @@ namespace vmstats.lang
             // Wait for the actor system to terminate so we have time to debug things
             sys.WhenTerminated.Wait();
         }
+*/
 
-
-        public void DecodeAndExecute(string commandsToDecode)
+        public void DecodeAndExecute(string commandsToDecode, Queue<BuildTransformSeries> series)
         {
+/*
             try
             {
+*/
                 // Create an ANTLR input stream to process the DSL entered
                 AntlrInputStream inputStream = new AntlrInputStream(commandsToDecode);
 
@@ -71,22 +73,42 @@ namespace vmstats.lang
                 // Pass the tokens to the parser
                 VmstatsParser parser = new VmstatsParser(tokens);
 
+                parser.RemoveErrorListeners();
+
                 // Specify the entry point to the stream of tokens
                 VmstatsParser.Transform_pipelineContext context = parser.transform_pipeline();
 
                 // Create an instance of our listener class to be called as we walk the language
-                MyListener myListener = new MyListener(_log, Series);
+                MyListener myListener = new MyListener(_log, series);
+
+                // Create an instance of our ERROR listener class and add it to the parser so we can catch errors
+                //                MyErrorListener myErrorListener = new MyErrorListener();
+                //                lexer.RemoveErrorListeners();
+                //                lexer.AddErrorListener(myErrorListener);
+
+
+                //                parser.CompileParseTreePattern()
+                parser.ErrorHandler = new BailErrorStrategy();
 
                 // Create a tree walker to walk the AST
                 ParseTreeWalker walker = new ParseTreeWalker();
 
                 // Now walk the AST having the listener be called during all the events
                 walker.Walk(myListener, context);
+
+            _log.Debug("Walked the tree to decode the DSL. Result: " + JsonConvert.SerializeObject(series));
+/*
             }
             catch (RecognitionException ex)
             {
+                // Cannot get the code to throw any exceptions when the grammer is very wrong
+                _log.Error("Error processing transform DSL statement. Reason: " + ex);
+            } catch (Exception ex)
+            {
+                // Cannot get the code to throw any exceptions when the grammer is very wrong
                 _log.Error("Error processing transform DSL statement. Reason: " + ex);
             }
+*/
         }
     }
 }

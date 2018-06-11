@@ -21,9 +21,6 @@ namespace vmstats.lang.Tests
             string simpleTransformationPipeline = "CPUMAX->" + RemoveBaseNoiseActor.TRANSFORM_NAME +
                 ":" + RemoveSpikeActor.TRANSFORM_NAME + "{ " + RemoveSpikeActor.SPIKE_WINDOW_LENGTH + " = 3}";
 
-            // Build a string containing errors in the DSL
-            string errorTransformationPipeline = "CPUMAX -> RBN : 'JON' {param-1=value$4}";
-
             // Create the container for all the actors
             var sys = ActorSystem.Create("vmstats-lang-tests"/*, config*/);
 
@@ -39,8 +36,8 @@ namespace vmstats.lang.Tests
             Queue<BuildTransformSeries> result = new Queue<BuildTransformSeries>();
 
             // translate the DSL in the test text and execute the tranform pipeline it represents
-            var tp = new TransformationLanguage(sys.Log, result);
-            tp.DecodeAndExecute(cmd);
+            var tp = new TransformationLanguage(sys.Log);
+            tp.DecodeAndExecute(cmd, result);
 
             // Generate the expected results
             var expectedResult = generateTestData_When_DSLWithTwoTransformsAndSingleParameterUsed_Expect_SingleValidTransformPipelineBuilt();
@@ -83,7 +80,7 @@ namespace vmstats.lang.Tests
         public void When_DSLIsInvlaid_Expect_Exception()
         {
             // Build a string containing errors in the DSL
-            string errorTransformationPipeline = "CPUMAX -> RBN : 'JON' {param-1=value$4}";
+            string errorTransformationPipeline = "CPUMAX && ^^ -> RBN : 'JON' {param-1=value$4}";
 
             // Pick one of the defined above pipelines to use in the test
             string cmd = errorTransformationPipeline;
@@ -96,9 +93,9 @@ namespace vmstats.lang.Tests
             Queue<BuildTransformSeries> result = new Queue<BuildTransformSeries>();
 
             // translate the DSL in the test text and execute the tranform pipeline it represents
-            var tp = new TransformationLanguage(sys.Log, result);
-            RecognitionException ex = Assert.Throws<RecognitionException>(delegate { tp.DecodeAndExecute(cmd); },
-                "Expected exceptiion thrown.");
+            var tp = new TransformationLanguage(sys.Log);
+            VmstatsLangException ex = Assert.Throws<VmstatsLangException>(delegate { tp.DecodeAndExecute(cmd, result); },
+                "Unexpected exceptiion thrown.");
         }
     }
 }

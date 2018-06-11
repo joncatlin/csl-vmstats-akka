@@ -31,8 +31,4 @@
     </None>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="java -jar antlr-4.7.1-complete.jar -Dlanguage=CSharp -visitor Vmstats.g4" />
-  </Target>
-
 </Project>
