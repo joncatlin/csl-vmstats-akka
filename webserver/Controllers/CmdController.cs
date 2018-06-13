@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using vmstats.lang;
 using transforms;
+using vmstats;
 
 namespace webserver.Controllers
 {
@@ -14,7 +15,7 @@ namespace webserver.Controllers
     public class CmdController : ControllerBase
     {
         // Get a reference to the Startup class which holds the actor system initialization
-        static vmstats.Startup startup = vmstats.Startup.Instance;
+        static StartActors startup = StartActors.Instance;
 
         // GET api/cmd
         [HttpGet]

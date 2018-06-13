@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vmstats-lang", "vmstats-lan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "transforms", "transforms\transforms.csproj", "{F770A89E-7EA5-4426-9300-307252123B30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "webserver", "webserver\webserver.csproj", "{6F1BB835-9B68-487C-81A6-A13E11938F65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "webserver", "webserver\webserver.csproj", "{6F1BB835-9B68-487C-81A6-A13E11938F65}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B8B80609-B206-465A-8EBB-DF8EC698FAFC}"
+	ProjectSection(SolutionItems) = preProject
+		config.txt = config.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

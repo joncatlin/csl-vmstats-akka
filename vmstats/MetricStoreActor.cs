@@ -55,6 +55,7 @@ namespace vmstats
 
             // Commands
             Command<UpsertMetric>(um => Persist(um, s => {
+                _log.Debug($"Received UpserMetrics msg actor id={PersistenceId}");
                 ProcessUpsertMetric(um);
                 SaveSnapshot(_metricStore);
             }));
@@ -62,9 +63,10 @@ namespace vmstats
                 // soft-delete the journal up until the sequence # at
                 // which the snapshot was taken
                 DeleteMessages(success.Metadata.SequenceNr);
+                _log.Debug($"Save snapshot successful for actor id={PersistenceId}");
             });
             Command<SaveSnapshotFailure>(failure => {
-                // handle snapshot save failure...
+                _log.Error($"ERROR: Failed to save snapshot for actor with id={PersistenceId}");
             });
         }
 

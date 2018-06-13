@@ -1,30 +1,26 @@
-#FROM microsoft/aspnetcore-build:2.0.0 AS build-env
-#WORKDIR /app
-
-# Copy csproj and restore as distinct layers
-#COPY *.csproj ./
-#RUN dotnet restore
-
-# Copy everything else and build
-#COPY . ./
-#RUN dotnet publish -c Release -o out
-
-# Build runtime image
-#FROM microsoft/aspnetcore:2.0.0
-#WORKDIR /app
-#COPY --from=build-env /app/out .
-#ENTRYPOINT ["dotnet", "cad_restapi.dll"]
-
-
-
-
-
 FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
 WORKDIR /app
 EXPOSE 80
-ENV DIR_NAME temp
+
+# Where to look for the metric data
+RUN mkdir /data
+VOLUME /data
+
+# Where to look for the configuration
+RUN mkdir /config
+VOLUME /config
+
+# Where to store the snapshots
+RUN mkdir /snapshots
+VOLUME /snapshots
+
+COPY config.txt /config/
+
+# define the environment variables
+ENV DIR_NAME /data
 ENV FILE_TYPE *.csv
 ENV VMNAME_PATTERN vmpattern
+ENV CONFIG_FILE /config/config.txt
 
 
 FROM microsoft/dotnet:2.1-sdk AS build
@@ -55,4 +51,5 @@ RUN dotnet publish -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
+
 ENTRYPOINT ["dotnet", "webserver.dll"]

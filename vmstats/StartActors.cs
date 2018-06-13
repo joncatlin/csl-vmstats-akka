@@ -9,53 +9,66 @@ using Akka.Event;
 
 namespace vmstats
 {
-    public sealed class Startup
+    public sealed class StartActors
     {
         // This is a Singleton
-        private static readonly Startup instance = new Startup();
+        private static StartActors instance = null;
+        private static readonly object padlock = new object();
 
-        // Explicit static constructor to tell C# compiler
-        // not to mark type as beforefieldinit
-        static Startup()
+        StartActors()
         {
         }
 
-        private Startup()
-        {
-
-        }
-
-        public static Startup Instance
+        public static StartActors Instance
         {
             get
             {
-                return instance;
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new StartActors();
+                        instance.Initialize();
+                    }
+                    return instance;
+                }
             }
         }
 
         // Names of all the environment variables needed by the application
         static readonly string ENV_DIRNAME = "DIR_NAME";
 	    static readonly string ENV_FILETYPE = "FILE_TYPE";
-	    static readonly string ENV_VMNAME_PATTERN = "VMNAME_PATTERN";
+        static readonly string ENV_VMNAME_PATTERN = "VMNAME_PATTERN";
+        static readonly string ENV_CONFIG_FILE = "CONFIG_FILE";
 
         // Local state initialized from envornment variables
         private string fileType = null;
         private string dirName = "dummyfilename";
         private string vmNamePattern = null;
+        private string configFile= null;
+
+        private ActorSystem vmstatsActorSystem;
 
         public ILoggingAdapter _log { get; set; }
 
-        public void Start()
+        private void Initialize()
         {
-            // Get the configuration of the akka system
-            var config = ConfigurationFactory.ParseString(GetConfiguration());
-
-            // Create the container for all the actors
-            var vmstatsActorSystem = ActorSystem.Create("vmstats", config);
-            _log = vmstatsActorSystem.Log;
-
             // Initialise state from environment variables
             GetEnvironmentVariables();
+
+            // Get the configuration of the akka system
+            if (!File.Exists(configFile))
+            {
+                Console.WriteLine($"ERROR: In StartActors.Initialize(). Configuration file does not exist. configPath={configFile}");
+                System.Environment.Exit(-1);
+            }
+
+            string textConfig = File.ReadAllText(configFile);
+            var config = ConfigurationFactory.ParseString(textConfig);
+
+            // Create the container for all the actors
+            vmstatsActorSystem = ActorSystem.Create("vmstats", config);
+            _log = vmstatsActorSystem.Log;
 
             // Create the metric dispatcher
             Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor());
@@ -85,6 +98,7 @@ namespace vmstats
             dirName = GetEnvironmentVariable(ENV_DIRNAME);
             fileType = GetEnvironmentVariable(ENV_FILETYPE);
             vmNamePattern = GetEnvironmentVariable(ENV_VMNAME_PATTERN);
+            configFile= GetEnvironmentVariable(ENV_CONFIG_FILE);
         }
 
 
@@ -99,17 +113,17 @@ namespace vmstats
             }
 
             // Output the env variable's value
-            _log.Info($"Environment variable initialized. Variable: {envVarName}. Value: {temp}");
+            Console.WriteLine($"Environment variable initialized. Variable: {envVarName}. Value: {temp}");
             return temp;
         }
 
-
+/*
         private static string GetConfiguration()
         {
             string config = @"
                 akka {  
-                    stdout-loglevel = DEBUG
-                    loglevel = DEBUG
+                    stdout-loglevel = INFO
+                    loglevel = INFO
 #                    loggers = [""Akka.Logger.NLog.NLogLogger, Akka.Logger.NLog""]
                     log-config-on-start = on
 
@@ -137,5 +151,6 @@ namespace vmstats
 
             return config;
         }
+        */
     }
 }

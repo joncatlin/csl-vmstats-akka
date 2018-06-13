@@ -1,0 +1,41 @@
+akka {
+	stdout-loglevel = DEBUG
+	loglevel = DEBUG
+#    loggers = [""Akka.Logger.NLog.NLogLogger, Akka.Logger.NLog""]
+	log-config-on-start = on
+
+#	actor
+#	{
+#		debug
+#		{
+#		receive = on      # log any received message
+#		autoreceive = on  # log automatically received messages, e.g. PoisonPill
+#		lifecycle = on    # log actor lifecycle changes
+#		event-stream = on # log subscription changes for Akka.NET event stream
+#		unhandled = on    # log unhandled messages sent to actors
+#		}
+#	}
+}
+
+# Local file system snapshot store plugin.
+akka.persistence.snapshot-store.local {
+
+    # Class name of the plugin.
+    class = "Akka.Persistence.Snapshot.LocalSnapshotStore, Akka.Persistence"
+
+    # Dispatcher for the plugin actor.
+    plugin-dispatcher = "akka.persistence.dispatchers.default-plugin-dispatcher"
+
+    # Dispatcher for streaming snapshot IO.
+    stream-dispatcher = "akka.persistence.dispatchers.default-stream-dispatcher"
+
+    # Storage location of snapshot files.
+    dir = "/snapshots"
+
+    # Number load attempts when recovering from the latest snapshot fails
+    # yet older snapshot files are available. Each recovery attempt will try
+    # to recover using an older than previously failed-on snapshot file
+    # (if any are present). If all attempts fail the recovery will fail and
+    # the persistent actor will be stopped.
+    max-load-attempts = 3
+}

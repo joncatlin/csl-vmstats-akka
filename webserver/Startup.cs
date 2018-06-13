@@ -11,14 +11,14 @@ namespace webserver
     {
         // Keep this at the class level so we do not garbage collect it, as other classes
         // will use the instanace.
-        static vmstats.Startup startup = vmstats.Startup.Instance;
-
+        static StartActors startActors = null;
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
 
-            // Create the actor system and start all of the actors
-            startup.Start();
+            // Start the vmstats actors etc
+            startActors = StartActors.Instance;
         }
 
         public IConfiguration Configuration { get; }

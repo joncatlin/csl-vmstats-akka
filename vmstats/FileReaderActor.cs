@@ -95,7 +95,7 @@ namespace vmstats
             // Move the file to the processed directory so we do not process it again
             string nameOnly = Path.GetFileName(msg.fileName);
             string directory = Path.GetDirectoryName(msg.fileName);
-            string fileTo = directory + "\\ProcessedFiles\\" + nameOnly;
+            string fileTo = directory + Path.DirectorySeparatorChar + "ProcessedFiles" + Path.DirectorySeparatorChar + nameOnly;
 
             try
             {
@@ -103,9 +103,12 @@ namespace vmstats
                 if (!File.Exists(fileTo))
                 {
                     File.Move(msg.fileName, fileTo);
-                } else
+                    _log.Info($"Moving file to {fileTo}");
+                }
+                else
                 {
                     File.Delete(msg.fileName);
+                    _log.Info($"Directory to move file to does not exist. Path to move file was {fileTo}");
                 }
             } catch (IOException e)
             {
