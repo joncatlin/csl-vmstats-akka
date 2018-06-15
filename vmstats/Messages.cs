@@ -1,6 +1,8 @@
-﻿namespace vmstats
+﻿using System;
+
+namespace vmstats
 {
-    class Messages
+    public class Messages
     {
         #region funcational messages
         /// <summary>
@@ -47,6 +49,19 @@
                 this.headings = headings;
             }
         }
+
+
+        /// <summary>
+        /// Message sent from the client requesting a transform pipeline be built and executed.
+        /// </summary>
+        public class ProcessCommand
+        {
+            public DateTime FromDate { get; set; }
+            public DateTime ToDate { get; set; }
+            public string VmPattern { get; set; }
+            public string Dsl { get; set; }
+        }
+
         #endregion
     }
 }

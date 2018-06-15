@@ -63,6 +63,8 @@ namespace vmstats
                 // soft-delete the journal up until the sequence # at
                 // which the snapshot was taken
                 DeleteMessages(success.Metadata.SequenceNr);
+                var snapSelectCrit = new SnapshotSelectionCriteria(success.Metadata.SequenceNr - 1);
+                DeleteSnapshots(snapSelectCrit);
                 _log.Debug($"Save snapshot successful for actor id={PersistenceId}");
             });
             Command<SaveSnapshotFailure>(failure => {

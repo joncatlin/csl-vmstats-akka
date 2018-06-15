@@ -34,7 +34,7 @@ namespace webserver.Controllers
 
 //        [HttpPost(Name = nameof(ValidateRequest))]
         [HttpPost]
-        public ActionResult<CreatedAtRouteResult> Post([FromBody] ProcessCommand request)
+        public ActionResult<CreatedAtRouteResult> Post([FromBody] vmstats.Messages.ProcessCommand request)
         {
             try
             {
