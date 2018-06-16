@@ -16,8 +16,9 @@ namespace vmstats
 
         protected override void PreStart()
         {
-                _fileReaderActor = Context.ActorOf(Props.Create(() =>
-                new FileReaderActor(vmNamePattern, _metricAccumulatorDispatcherActor))
+            _log.Info($"Creating file read actor pool with vmNamePattern={vmNamePattern}");
+            _fileReaderActor = Context.ActorOf(Props.Create(() =>
+            new FileReaderActor(vmNamePattern, _metricAccumulatorDispatcherActor))
                 .WithRouter(new RoundRobinPool(10)));
         }
 
@@ -26,6 +27,7 @@ namespace vmstats
 
             this.vmNamePattern = vmNamePattern;
             _metricAccumulatorDispatcherActor = metricDispatcher;
+            _log.Info($"Initializing with vmNamePattern={vmNamePattern}");
         }
 
 

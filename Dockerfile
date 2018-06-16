@@ -14,14 +14,19 @@ VOLUME /config
 RUN mkdir /snapshots
 VOLUME /snapshots
 
+# Where to store the log files
+RUN mkdir /logs
+VOLUME /logs
+
 COPY config.txt /config/
+COPY NLog.config /app/
 
 # define the environment variables
 ENV DIR_NAME /data
 ENV FILE_TYPE *.csv
 ENV VMNAME_PATTERN vmpattern
 ENV CONFIG_FILE /config/config.txt
-
+ENV SNAPSHOT_PATH /snapshots
 
 FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src

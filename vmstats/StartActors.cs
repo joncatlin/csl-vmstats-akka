@@ -40,14 +40,16 @@ namespace vmstats
 	    static readonly string ENV_FILETYPE = "FILE_TYPE";
         static readonly string ENV_VMNAME_PATTERN = "VMNAME_PATTERN";
         static readonly string ENV_CONFIG_FILE = "CONFIG_FILE";
+        static readonly string ENV_SNAPSHOT_PATH = "SNAPSHOT_PATH";
 
         // Local state initialized from envornment variables
         private string fileType = null;
         private string dirName = "dummyfilename";
         private string vmNamePattern = null;
-        private string configFile= null;
+        private string configFile = null;
+        private string snapshotPath = null;
 
-        private ActorSystem vmstatsActorSystem;
+        public ActorSystem vmstatsActorSystem;
 
         public ILoggingAdapter _log { get; set; }
 
@@ -74,23 +76,40 @@ namespace vmstats
             Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor());
             IActorRef metricAccumulatorDispatcherActor = vmstatsActorSystem.ActorOf(metricAccumulatorDispatcherProps,
                 "metricAccumulatorDispatcherActor");
+            _log.Debug("Creating the metricAccumulatorDispatcherActor");
 
             // Create the actor that will watch the directory for new files being added
             Props directoryWatcherProps = Props.Create(() => new DirectoryWatcherActor(vmNamePattern, metricAccumulatorDispatcherActor));
             IActorRef directoryWatcherActor = vmstatsActorSystem.ActorOf(directoryWatcherProps,
                 "directoryWatcherActor");
+            _log.Debug("Creating the directoryWatcherActor");
 
             // Initialize the actor and then get it to check the directory for files
             directoryWatcherActor.Tell(new DirectoryWatcherActor.InitializeCommand(dirName, fileType));
+            _log.Debug("Send DirectoryWatcherActor.InitializeCommand(dirName, fileType) message to directoryWatcherActor");
 
             // Schedule the DirectoryWatcher to check the directory
             vmstatsActorSystem.Scheduler
                .ScheduleTellRepeatedly(TimeSpan.FromSeconds(0),
                          TimeSpan.FromSeconds(30),
                           directoryWatcherActor, DirectoryWatcherActor.CheckDirCommand, ActorRefs.NoSender);
+            _log.Debug("Scheduling the directoryWatcherActor with CheckDirCommand");
+
+            // Create the MetricStoreManagerActor
+            Props managerProps = Props.Create(() => new MetricStoreManagerActor(snapshotPath));
+            IActorRef managerActor = vmstatsActorSystem.ActorOf(managerProps,
+                "MetricStoreManagerActor");
+            _log.Debug("Creating the MetricStoreManagerActor");
+
+            // Schedule the MetricStoreManager to check for new MetricStores
+            vmstatsActorSystem.Scheduler
+               .ScheduleTellRepeatedly(TimeSpan.FromSeconds(0),
+                         TimeSpan.FromSeconds(30),
+                          managerActor, new Messages.FindMetricStoreActorNames(), ActorRefs.NoSender);
+            _log.Debug("Scheduling the MetricStoreManager with FindMetricStoreActorNames");
 
             // Wait until actor system terminated
-//            vmstatsActorSystem.WhenTerminated.Wait();
+            //            vmstatsActorSystem.WhenTerminated.Wait();
         }
 
         private void GetEnvironmentVariables ()
@@ -98,7 +117,8 @@ namespace vmstats
             dirName = GetEnvironmentVariable(ENV_DIRNAME);
             fileType = GetEnvironmentVariable(ENV_FILETYPE);
             vmNamePattern = GetEnvironmentVariable(ENV_VMNAME_PATTERN);
-            configFile= GetEnvironmentVariable(ENV_CONFIG_FILE);
+            configFile = GetEnvironmentVariable(ENV_CONFIG_FILE);
+            snapshotPath = GetEnvironmentVariable(ENV_SNAPSHOT_PATH);
         }
 
 

@@ -31,7 +31,7 @@ namespace vmstats
             {
                 // Create the actor to store the Metrics once they have been accumulated
                 actor = Context.ActorOf(Props.Create(() =>
-                    new MetricStoreActor(msg.vmName, msg.date)), "MetricStore:" + key);
+                    new MetricStoreActor(msg.vmName, msg.date)), "MetricStore:" + msg.vmName + ":" + msg.date);
                 storeTable.Add(key, actor);
 
                 // Create the actor for the accumulator and store its reference

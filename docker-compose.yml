@@ -4,11 +4,12 @@ services:
   vmstats:
     image: joncatlin/vmstats
     volumes:
-      - "/mount/general-data/vmstats-data/:/data"
+      - "/mount/vmstats-data/Desktops/:/data"
       - "/mount/general-data/vmstats-config/:/config"
       - "/mount/general-data/vmstats-snapshots/:/snapshots"
+      - "/mount/general-data/vmstats-logs/:/logs"
     restart: always
     environment:
-      VMNAME_PATTERN: "V-BWill.*"
+      VMNAME_PATTERN: "V-.*"
     ports:
       - "8080:80"

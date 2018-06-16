@@ -62,6 +62,14 @@ namespace vmstats
             public string Dsl { get; set; }
         }
 
+
+        /// <summary>
+        /// Message that signals to find all the metricstore names and log them
+        /// </summary>
+        public class FindMetricStoreActorNames { };
+
+
+
         #endregion
     }
 }

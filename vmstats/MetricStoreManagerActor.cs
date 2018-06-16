@@ -15,7 +15,7 @@ namespace vmstats
     {
         // The regex pattern that defines the name of the snapshot files  
         private const string PATTERN = @"^snapshot-MetricStore%.*";
-        private const string FILENAME_PATTERN = @"^snapshot-MetricStore%(.*)%.*(?<vmname>V.*)%.*(?<date>\d{2}-\d{2}-\d{4})-(?<id>\d*)-\d*$";
+        private const string FILENAME_PATTERN = @"^snapshot-MetricStore%.*(?<vmname>V.*)%.*(?<date>\d{2}-\d{2}-\d{4})-(?<id>\d*)-\d*$";
 
         private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
@@ -44,6 +44,17 @@ namespace vmstats
             this.SnapshotPath = snapshotPath;
 
             Receive<Messages.ProcessCommand>(msg => Process(msg));
+            Receive<Messages.FindMetricStoreActorNames>(msg => Find(msg));
+        }
+
+
+        private void Find(Messages.FindMetricStoreActorNames msg)
+        {
+            // var foundActors = Context.ActorSelection("**/MetricStore:*");
+            _log.Info($"Processing FindMetricStoreActorNames");
+            FindAvailableMetrics();
+            var json = JsonConvert.SerializeObject(AvailableMetrics);
+            _log.Debug($"Processed FindMetricStoreActorNames msg. AvailableMetrics found: {json}");
         }
 
 
@@ -70,12 +81,18 @@ namespace vmstats
                         long ticks = date.Key;
                         DateTime dt = new DateTime(ticks);
                         string dateString = dt.ToString("MM-dd-yyyy");
-                        var name = vmname.Key + "-" + dateString;
+                        var name = "MetricStore:" + vmname.Key + ":" + dateString;
                         actorNames.Add(name);
                     }
                 }
             }
-            int i = 0;
+
+            // Now Tell each of the actors to process the request
+            foreach (var name in actorNames)
+            {
+                var foundActor = Context.ActorSelection("**/" + name);
+                foundActor.Tell()
+            }
         }
 
 
@@ -183,14 +200,14 @@ namespace vmstats
             IActorRef managerActor = vmstatsActorSystem.ActorOf(managerProps,
                 "MetricStoreManagerActor");
 
+            // Schedule the MetricStoreManager to check for new MetricStores
+            vmstatsActorSystem.Scheduler
+               .ScheduleTellRepeatedly(TimeSpan.FromSeconds(0),
+                         TimeSpan.FromSeconds(30),
+                          managerActor, new Messages.FindMetricStoreActorNames(), ActorRefs.NoSender);
+
             // Initialize the actor and then get it to check the directory for files
             //            managerActor.Tell(new DirectoryWatcherActor.InitializeCommand(dirName, fileType));
-
-            // Schedule the DirectoryWatcher to check the directory
-                        vmstatsActorSystem.Scheduler
-                            .ScheduleTellRepeatedly(TimeSpan.FromSeconds(0),
-                                        TimeSpan.FromSeconds(30),
-                                        managerActor, DirectoryWatcherActor.CheckDirCommand, ActorRefs.NoSender);
 
             // Send a ProcessCommand for a particular vmpattern and date
             var msg = new Messages.ProcessCommand();

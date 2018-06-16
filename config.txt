@@ -1,20 +1,20 @@
 akka {
 	stdout-loglevel = DEBUG
 	loglevel = DEBUG
-#    loggers = [""Akka.Logger.NLog.NLogLogger, Akka.Logger.NLog""]
+	loggers = ["Akka.Logger.NLog.NLogLogger, Akka.Logger.NLog"]
 	log-config-on-start = on
 
-#	actor
-#	{
-#		debug
-#		{
-#		receive = on      # log any received message
-#		autoreceive = on  # log automatically received messages, e.g. PoisonPill
-#		lifecycle = on    # log actor lifecycle changes
-#		event-stream = on # log subscription changes for Akka.NET event stream
-#		unhandled = on    # log unhandled messages sent to actors
-#		}
-#	}
+	actor
+	{
+		debug
+		{
+		receive = on      # log any received message
+		autoreceive = on  # log automatically received messages, e.g. PoisonPill
+		lifecycle = on    # log actor lifecycle changes
+		event-stream = on # log subscription changes for Akka.NET event stream
+		unhandled = on    # log unhandled messages sent to actors
+		}
+	}
 }
 
 # Local file system snapshot store plugin.

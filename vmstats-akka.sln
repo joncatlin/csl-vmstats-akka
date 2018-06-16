@@ -14,6 +14,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B8B80609-B206-465A-8EBB-DF8EC698FAFC}"
 	ProjectSection(SolutionItems) = preProject
 		config.txt = config.txt
+		docker-compose.yml = docker-compose.yml
+		NLog.config = NLog.config
 	EndProjectSection
 EndProject
 Global

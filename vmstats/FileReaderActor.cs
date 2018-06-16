@@ -151,8 +151,16 @@ namespace vmstats
             // Send the metrics to the correct actor via the dispatcher
             for (int index = 0; index < newLength; index++)
             {
+                float temp;
+                try
+                {
+                    temp = (elements[3 + index] != "") ? float.Parse(elements[3 + index]) : 0.0F;
+                } catch (Exception e)
+                {
+                    temp = 0.0F;
+                }
                 _metricAccumulatorDispatcherActor.Tell(new Messages.MetricsToBeProcessed(vmName, date, timestamp, 
-                    float.Parse(elements[3 + index]), headings[index]));
+                    temp, headings[index]));
             }
 
 
