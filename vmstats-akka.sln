@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vmstats", "vmstats\vmstats.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vmstats-lang", "vmstats-lang\vmstats-lang.csproj", "{EBF04009-4847-4D1D-8503-DC4EBB7BFD9A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "transforms", "transforms\transforms.csproj", "{F770A89E-7EA5-4426-9300-307252123B30}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "webserver", "webserver\webserver.csproj", "{6F1BB835-9B68-487C-81A6-A13E11938F65}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B8B80609-B206-465A-8EBB-DF8EC698FAFC}"
@@ -32,10 +30,6 @@ Global
 		{EBF04009-4847-4D1D-8503-DC4EBB7BFD9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBF04009-4847-4D1D-8503-DC4EBB7BFD9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBF04009-4847-4D1D-8503-DC4EBB7BFD9A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F770A89E-7EA5-4426-9300-307252123B30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F770A89E-7EA5-4426-9300-307252123B30}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F770A89E-7EA5-4426-9300-307252123B30}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F770A89E-7EA5-4426-9300-307252123B30}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6F1BB835-9B68-487C-81A6-A13E11938F65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6F1BB835-9B68-487C-81A6-A13E11938F65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F1BB835-9B68-487C-81A6-A13E11938F65}.Release|Any CPU.ActiveCfg = Release|Any CPU

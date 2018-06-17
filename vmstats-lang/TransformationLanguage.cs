@@ -6,7 +6,7 @@ using Akka.Event;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using Newtonsoft.Json;
-using transforms;
+using static vmstats.Messages;
 
 namespace vmstats.lang
 {

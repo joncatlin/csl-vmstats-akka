@@ -31,7 +31,7 @@ namespace vmstats
             FindAvailableMetrics();
 
             // Start a filewatcher on the snapshot directory to be notified whenever a new file is created
-            StartFileWatcher();
+//            StartFileWatcher();
 
             // Log list of found stores
             var stores = JsonConvert.SerializeObject(AvailableMetrics);
@@ -43,7 +43,7 @@ namespace vmstats
         {
             this.SnapshotPath = snapshotPath;
 
-            Receive<Messages.ProcessCommand>(msg => Process(msg));
+            Receive<Messages.StartProcessingTransformPipeline>(msg => Process(msg));
             Receive<Messages.FindMetricStoreActorNames>(msg => Find(msg));
         }
 
@@ -57,12 +57,22 @@ namespace vmstats
             _log.Debug($"Processed FindMetricStoreActorNames msg. AvailableMetrics found: {json}");
         }
 
+        internal class ActorID{
+            public string VmName { get; private set; }
+            public string Date { get; private set; }
 
-        private void Process(Messages.ProcessCommand msg)
+            public ActorID(string vmName, string date)
+            {
+                VmName = vmName;
+                Date = date;
+            }
+        }
+
+        private void Process(Messages.StartProcessingTransformPipeline msg)
         {
-            Regex reg = new Regex(msg.VmPattern);
-            long from = msg.FromDate.Ticks;
-            long to = msg.ToDate.Ticks;
+            Regex reg = new Regex(msg.cmd.VmPattern);
+            long from = msg.cmd.FromDate.Ticks;
+            long to = msg.cmd.ToDate.Ticks;
 
             // Find all of the MetricStoreActors that match the vmname and are in the date range
             var found = AvailableMetrics.ToList().Where
@@ -71,7 +81,7 @@ namespace vmstats
             ).ToList();
 
             // Find all those MetricStoreActors that match the dates
-            List<string> actorNames = new List<string>();
+            List<ActorID> actorNames = new List<ActorID>();
             foreach (var vmname in found)
             {
                 foreach (var date in vmname.Value)
@@ -81,17 +91,28 @@ namespace vmstats
                         long ticks = date.Key;
                         DateTime dt = new DateTime(ticks);
                         string dateString = dt.ToString("MM-dd-yyyy");
-                        var name = "MetricStore:" + vmname.Key + ":" + dateString;
-                        actorNames.Add(name);
+                        var id = new ActorID(vmname.Key, dateString);
+                        actorNames.Add(id);
                     }
                 }
             }
 
             // Now Tell each of the actors to process the request
-            foreach (var name in actorNames)
+            foreach (var id in actorNames)
             {
-                var foundActor = Context.ActorSelection("**/" + name);
-                foundActor.Tell()
+                var actorName = "MetricStore:" + id.VmName + ":" + id.Date;
+                _log.Debug($"Begin sending msgs to actor named: {actorName}");
+
+                // Send the actor a msg for each of the transforms in the pipeline
+                foreach (var series in msg.queue)
+                {
+                    // The Metric Store may not be active so activeate it
+                    var actor = Context.ActorOf(Props.Create(() =>
+                        new MetricStoreActor(id.VmName, id.Date)), actorName);
+
+                    _log.Debug($"Telling metric stored named: {actorName} to start processing a transform pipeline: {JsonConvert.SerializeObject(series)}");
+                    actor.Tell(series);
+                }
             }
         }
 

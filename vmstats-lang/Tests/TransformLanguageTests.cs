@@ -5,9 +5,9 @@ using Akka.Actor;
 using vmstats;
 using Akka.Configuration;
 using Newtonsoft.Json;
-using transforms;
 using System;
 using Antlr4.Runtime;
+using static vmstats.Messages;
 
 namespace vmstats.lang.Tests
 {

@@ -7,6 +7,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Collections;
 using Akka.Event;
+using Newtonsoft.Json;
 
 namespace vmstats
 {
@@ -65,22 +66,43 @@ namespace vmstats
                 DeleteMessages(success.Metadata.SequenceNr);
 
                 // Delete all previous snapshots so we only keep the latest one
-                var snapSelectCrit = new SnapshotSelectionCriteria(success.Metadata.SequenceNr - 1, success.Metadata.Timestamp);
+                var snapSelectCrit = new SnapshotSelectionCriteria(success.Metadata.SequenceNr - 1, success.Metadata.Timestamp, 0, new DateTime(0));
                 DeleteSnapshots(snapSelectCrit);
                 _log.Info($"Save snapshot successful for actor id={PersistenceId}");
             });
             Command<SaveSnapshotFailure>(failure => {
                 _log.Error($"ERROR: Failed to save snapshot for actor with id={PersistenceId}");
             });
+            Command<Messages.BuildTransformSeries>(msg => ProcessPipeline(msg));
         }
 
+
+        private void ProcessPipeline(Messages.BuildTransformSeries cmd)
+        {
+            // Get the metric requested in the pipeline
+            Metric metric = null;
+            _metricStore.metrics.TryGetValue(cmd.MetricName.ToLower(), out metric);
+            if (metric != null)
+            {
+                // Create a start transform message and submit it to the first transform in the queue
+                var msg = new Messages.TransformSeries(metric, cmd.Transforms, cmd.GroupID);
+
+                BaseTransformActor.RouteTransform(msg);
+            }
+            else
+            {
+                // ERROR the requested metric does not exist in this actor
+                var json = JsonConvert.SerializeObject(_metricStore.metrics.Keys);
+                _log.Error($"ERROR: Received ProcessPipeline ciommand for a metric that does not exist. Mteric requested is: {cmd.MetricName}. Available metrics are: {json}");
+            }
+        }
 
         private void ProcessUpsertMetric(UpsertMetric um)
         {
             // If the metric already existed then add any missing values to it from the received 
             // ones in the upsert message
             Metric retrievedMetric;
-            if (_metricStore.metrics.TryGetValue(um.name, out retrievedMetric))
+            if (_metricStore.metrics.TryGetValue(um.name.ToLower(), out retrievedMetric))
             {
                 // Check to see if each of the metrics in the upsert are in the retireved metrics.
                 // If not add them otheriwse update if they have changed.
@@ -105,8 +127,8 @@ namespace vmstats
             else
             {
                 // Add the new metrics to the store
-                var newMetric = new Metric(um.name, um.metrics);
-                _metricStore.metrics.Add(um.name, newMetric);
+                var newMetric = new Metric(um.name.ToLower(), um.metrics);
+                _metricStore.metrics.Add(um.name.ToLower(), newMetric);
             }
 
             _log.Debug("Metrics received. VMName={0} Date={1}", _metricStore.vmName, _metricStore.date);
