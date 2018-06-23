@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Akka.Actor;
 using Akka.Event;
 using Akka.Routing;
@@ -11,11 +14,12 @@ using Newtonsoft.Json;
 
 namespace vmstats
 {
-    class MetricStoreManagerActor : ReceiveActor
+    public class MetricStoreManagerActor : ReceiveActor
     {
         // The regex pattern that defines the name of the snapshot files  
         private const string PATTERN = @"^snapshot-MetricStore%.*";
         private const string FILENAME_PATTERN = @"^snapshot-MetricStore%.*(?<vmname>V.*)%.*(?<date>\d{2}-\d{2}-\d{4})-(?<id>\d*)-\d*$";
+        public const string ACTOR_NAME = "MetricStoreManager";
 
         private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
@@ -24,6 +28,7 @@ namespace vmstats
 
         // The place where the snapshots are stored
         private readonly string SnapshotPath;
+        private readonly string guiWebserverUrl;
 
         protected override void PreStart()
         {
@@ -39,18 +44,68 @@ namespace vmstats
         }
 
 
-        public MetricStoreManagerActor(string snapshotPath)
+        public MetricStoreManagerActor(string snapshotPath, string guiWebserverUrl)
         {
             this.SnapshotPath = snapshotPath;
+            this.guiWebserverUrl = guiWebserverUrl;
 
             Receive<Messages.StartProcessingTransformPipeline>(msg => Process(msg));
             Receive<Messages.FindMetricStoreActorNames>(msg => Find(msg));
+            Receive<Messages.TransformSeries>(msg => ReturnResult(msg));
         }
 
+        private async void ReturnResult(Messages.TransformSeries msg)
+        {
+            HttpClient client = null;
+
+            try
+            {
+                // Contact the vmstatsgui webserver and send it the details or the completed transform pipeline
+                client = new HttpClient();
+                client.BaseAddress = new Uri(guiWebserverUrl);
+
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+
+                // Create a new ProcessCommand with the supplied data
+                string postBody = JsonConvert.SerializeObject(msg);
+
+                // Send the results to the vmstatsGUI
+                HttpResponseMessage response = await client.PostAsync(guiWebserverUrl, new StringContent(postBody, Encoding.UTF8, "application/json"));
+                if (response.IsSuccessStatusCode)
+                {
+                    _log.Debug("Successfully returned the result of a transform seriues to the vmstatsGUI.");
+                }
+                else
+                {
+                    _log.Error($"Failed to ReturnResult to vmstatsGUI. Reason: {response.ReasonPhrase}");
+                }
+            }
+            catch (HttpRequestException hre)
+            {
+                _log.Error($"ERROR Calling vmstatsgui webserver. Error is: {hre.Message}");
+            }
+            catch (TaskCanceledException tce)
+            {
+                _log.Error($"ERROR Calling vmstatsgui webserver. Error is: {tce.Message}");
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"ERROR Calling vmstatsgui webserver. Error is: {ex.Message} ");
+            }
+            finally
+            {
+                if (client != null)
+                {
+                    client.Dispose();
+                    client = null;
+                }
+            }
+        }
 
         private void Find(Messages.FindMetricStoreActorNames msg)
         {
-            // var foundActors = Context.ActorSelection("**/MetricStore:*");
             _log.Info($"Processing FindMetricStoreActorNames");
             FindAvailableMetrics();
             var json = JsonConvert.SerializeObject(AvailableMetrics);
@@ -106,12 +161,29 @@ namespace vmstats
                 // Send the actor a msg for each of the transforms in the pipeline
                 foreach (var series in msg.queue)
                 {
-                    // The Metric Store may not be active so activeate it
-                    var actor = Context.ActorOf(Props.Create(() =>
-                        new MetricStoreActor(id.VmName, id.Date)), actorName);
+                    // Pass the clients connection Id to the series so that it know why client to send the results to
+                    series.ConnectionId = msg.cmd.ConnectionId;
 
-                    _log.Debug($"Telling metric stored named: {actorName} to start processing a transform pipeline: {JsonConvert.SerializeObject(series)}");
-                    actor.Tell(series);
+                    try
+                    {
+                        // The Metric Store may not be active so activeate it
+                        var actor = Context.ActorOf(Props.Create(() =>
+                            new MetricStoreActor(id.VmName, id.Date)), actorName);
+
+                        _log.Debug($"Telling new metric stored named: {actorName} to start processing a transform pipeline: {JsonConvert.SerializeObject(series)}");
+                        actor.Tell(series);
+                    }
+                    catch (InvalidActorNameException)
+                    {
+                        // IGNORE THIS. If the actor already exists then get its context by looking it up and sending it the messge.
+                        var foundActor = Context.ActorSelection("**/" + actorName);
+                        foundActor.Tell(series);
+                        _log.Debug($"Telling existing metric stored named: {actorName} to start processing a transform pipeline: {JsonConvert.SerializeObject(series)}");
+                    }
+                    catch (Exception)
+                    {
+                        _log.Error($"Execption thrown while trying to communicate to actor: {actorName}. Pipeline: {JsonConvert.SerializeObject(series)}");
+                    }
                 }
             }
         }
@@ -173,74 +245,44 @@ namespace vmstats
             return false;
         }
 
+        /*
+                private void StartFileWatcher() { 
+                    var fileSystemWatcher = new FileSystemWatcher();
 
-        private void StartFileWatcher() { 
-            var fileSystemWatcher = new FileSystemWatcher();
+                    // Associate event handlers with the events
+                    fileSystemWatcher.Created += FileSystemWatcher_Created;
+        //            fileSystemWatcher.Changed += FileSystemWatcher_Changed;
+        //            fileSystemWatcher.Deleted += FileSystemWatcher_Deleted;
+        //            fileSystemWatcher.Renamed += FileSystemWatcher_Renamed;
 
-            // Associate event handlers with the events
-            fileSystemWatcher.Created += FileSystemWatcher_Created;
-//            fileSystemWatcher.Changed += FileSystemWatcher_Changed;
-//            fileSystemWatcher.Deleted += FileSystemWatcher_Deleted;
-//            fileSystemWatcher.Renamed += FileSystemWatcher_Renamed;
+                    // Set the path of the directory to watch
+                    fileSystemWatcher.Path = SnapshotPath;
 
-            // Set the path of the directory to watch
-            fileSystemWatcher.Path = SnapshotPath;
- 
-            // Start event notification
-            fileSystemWatcher.EnableRaisingEvents = true;
-        }
-/*
-        private void FileSystemWatcher_Renamed(object sender, RenamedEventArgs e)
-        {
-            Console.WriteLine("Hello");
-        }
+                    // Start event notification
+                    fileSystemWatcher.EnableRaisingEvents = true;
+                }
 
-        private void FileSystemWatcher_Deleted(object sender, FileSystemEventArgs e)
-        {
-            Console.WriteLine("Hello");
-        }
+                private void FileSystemWatcher_Renamed(object sender, RenamedEventArgs e)
+                {
+                    Console.WriteLine("Hello");
+                }
 
-        private void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            Console.WriteLine("Hello");
-        }
-*/
-        private void FileSystemWatcher_Created(object sender, FileSystemEventArgs e)
-        {
-            _log.Info($"New file detected in snapshot directory. File name is: {e.Name}.");
-            AddFileToAvailableMetrics(e.Name);
-        }
+                private void FileSystemWatcher_Deleted(object sender, FileSystemEventArgs e)
+                {
+                    Console.WriteLine("Hello");
+                }
 
-        static void Main(string[] args)
-        {
-            // Create the container for all the actors
-            var vmstatsActorSystem = ActorSystem.Create("vmstats");
+                private void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
+                {
+                    Console.WriteLine("Hello");
+                }
 
-            // Create the metricstoremanager
-            Props managerProps = Props.Create(() => new MetricStoreManagerActor(@"C:\temp\snapshots"));
-            IActorRef managerActor = vmstatsActorSystem.ActorOf(managerProps,
-                "MetricStoreManagerActor");
+                private void FileSystemWatcher_Created(object sender, FileSystemEventArgs e)
+                {
+                    _log.Info($"New file detected in snapshot directory. File name is: {e.Name}.");
+                    AddFileToAvailableMetrics(e.Name);
+                }
+                */
 
-            // Schedule the MetricStoreManager to check for new MetricStores
-            vmstatsActorSystem.Scheduler
-               .ScheduleTellRepeatedly(TimeSpan.FromSeconds(0),
-                         TimeSpan.FromSeconds(30),
-                          managerActor, new Messages.FindMetricStoreActorNames(), ActorRefs.NoSender);
-
-            // Initialize the actor and then get it to check the directory for files
-            //            managerActor.Tell(new DirectoryWatcherActor.InitializeCommand(dirName, fileType));
-
-            // Send a ProcessCommand for a particular vmpattern and date
-            var msg = new Messages.ProcessCommand();
-            msg.FromDate = Convert.ToDateTime("01-16-2018");
-            msg.ToDate = Convert.ToDateTime("01-18-2018");
-            msg.Dsl = "MAXCPU->RBN:RNP";
-            msg.VmPattern = "V-JCatlin|V-BWill";
-
-            managerActor.Tell(msg);
-
-            // Wait until actor system terminated
-            vmstatsActorSystem.WhenTerminated.Wait();
-        }
     }
 }

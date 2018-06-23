@@ -1,0 +1,14 @@
+﻿1>------ Rebuild All started: Project: vmstats, Configuration: Debug Any CPU ------
+1>vmstats -> C:\Users\joncatlin\Documents\Development\Repositories\Github\csl-vmstats-akka\vmstats\bin\Debug\netcoreapp2.1\vmstats.dll
+2>------ Rebuild All started: Project: vmstats-lang, Configuration: Debug Any CPU ------
+2>VmstatsVisitor.cs(33,18,33,33): warning CS3021: 'IVmstatsVisitor<Result>' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute
+2>VmstatsBaseListener.cs(36,22,36,41): warning CS3021: 'VmstatsBaseListener' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute
+2>VmstatsBaseVisitor.cs(35,22,35,40): warning CS3021: 'VmstatsBaseVisitor<Result>' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute
+2>VmstatsParser.cs(35,22,35,35): warning CS3021: 'VmstatsParser' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute
+2>VmstatsLexer.cs(32,22,32,34): warning CS3021: 'VmstatsLexer' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute
+2>VmstatsListener.cs(32,18,32,34): warning CS3021: 'IVmstatsListener' does not need a CLSCompliant attribute because the assembly does not have a CLSCompliant attribute
+2>vmstats-lang -> C:\Users\joncatlin\Documents\Development\Repositories\Github\csl-vmstats-akka\vmstats-lang\bin\Debug\netcoreapp2.1\vmstats-lang.dll
+2>Done building project "vmstats-lang.csproj".
+3>------ Rebuild All started: Project: webserver, Configuration: Debug Any CPU ------
+3>webserver -> C:\Users\joncatlin\Documents\Development\Repositories\Github\csl-vmstats-akka\webserver\bin\Debug\netcoreapp2.1\webserver.dll
+========== Rebuild All: 3 succeeded, 0 failed, 0 skipped ==========

@@ -155,7 +155,7 @@ namespace vmstats
                 try
                 {
                     temp = (elements[3 + index] != "") ? float.Parse(elements[3 + index]) : 0.0F;
-                } catch (Exception e)
+                } catch (Exception)
                 {
                     temp = 0.0F;
                 }

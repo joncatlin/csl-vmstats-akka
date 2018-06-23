@@ -6,6 +6,7 @@ using NLog;
 using NLog.Config;
 using NLog.Targets;
 using Akka.Event;
+using Akka.Routing;
 
 namespace vmstats
 {
@@ -41,6 +42,7 @@ namespace vmstats
         static readonly string ENV_VMNAME_PATTERN = "VMNAME_PATTERN";
         static readonly string ENV_CONFIG_FILE = "CONFIG_FILE";
         static readonly string ENV_SNAPSHOT_PATH = "SNAPSHOT_PATH";
+        static readonly string ENV_VMSTATSGUI_WEBSERVER_URL = "VMSTATSGUI_WEBSERVER_URL";
 
         // Local state initialized from envornment variables
         private string fileType = null;
@@ -48,6 +50,7 @@ namespace vmstats
         private string vmNamePattern = null;
         private string configFile = null;
         private string snapshotPath = null;
+        private string guiWebserUrl = null;
 
         public ActorSystem vmstatsActorSystem;
 
@@ -71,6 +74,24 @@ namespace vmstats
             // Create the container for all the actors
             vmstatsActorSystem = ActorSystem.Create("vmstats", config);
             _log = vmstatsActorSystem.Log;
+
+            /*
+             * Create all of the transform actors so they are ready when needed. Each transform is a pool
+             * of actors.
+             */
+            // Create the RemoveBaseNoise actor pool
+            /*
+            var rbnProps = Props.Create<RemoveBaseNoiseActor>().WithRouter(FromConfig.Instance);
+            IActorRef rbn = vmstatsActorSystem.ActorOf(rbnProps, "Transforms:" + RemoveBaseNoiseActor.TRANSFORM_NAME.ToUpper());
+            var rbnName = rbn.Path.ToString();
+*/
+            Props rbnProps = Props.Create(() => new RemoveBaseNoiseActor()).WithRouter(new RoundRobinPool(5));
+            IActorRef rbn = vmstatsActorSystem.ActorOf(rbnProps, "Transforms-" + RemoveBaseNoiseActor.TRANSFORM_NAME.ToUpper());
+            var rbnName = rbn.Path.ToString();
+
+            // Create the RemoveSpikeNoise actor pool
+            Props rspProps = Props.Create(() => new RemoveSpikeActor()).WithRouter(new RoundRobinPool(5));
+            IActorRef rsp = vmstatsActorSystem.ActorOf(rspProps, "Transforms-" + RemoveSpikeActor.TRANSFORM_NAME.ToUpper());
 
             // Create the metric dispatcher
             Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor());
@@ -96,9 +117,9 @@ namespace vmstats
             _log.Debug("Scheduling the directoryWatcherActor with CheckDirCommand");
 
             // Create the MetricStoreManagerActor
-            Props managerProps = Props.Create(() => new MetricStoreManagerActor(snapshotPath));
+            Props managerProps = Props.Create(() => new MetricStoreManagerActor(snapshotPath, guiWebserUrl));
             IActorRef managerActor = vmstatsActorSystem.ActorOf(managerProps,
-                "MetricStoreManagerActor");
+                MetricStoreManagerActor.ACTOR_NAME);
             _log.Debug("Creating the MetricStoreManagerActor");
 
             // Schedule the MetricStoreManager to check for new MetricStores
@@ -119,6 +140,7 @@ namespace vmstats
             vmNamePattern = GetEnvironmentVariable(ENV_VMNAME_PATTERN);
             configFile = GetEnvironmentVariable(ENV_CONFIG_FILE);
             snapshotPath = GetEnvironmentVariable(ENV_SNAPSHOT_PATH);
+            guiWebserUrl = GetEnvironmentVariable(ENV_VMSTATSGUI_WEBSERVER_URL);
         }
 
 

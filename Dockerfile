@@ -27,6 +27,7 @@ ENV FILE_TYPE *.csv
 ENV VMNAME_PATTERN vmpattern
 ENV CONFIG_FILE /config/config.txt
 ENV SNAPSHOT_PATH /snapshots
+ENV VMSTATSGUI_WEBSERVER_URL docker01.dest.internal:5000
 
 FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src

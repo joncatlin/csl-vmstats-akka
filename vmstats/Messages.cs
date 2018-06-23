@@ -62,6 +62,7 @@ namespace vmstats
             public DateTime ToDate { get; set; }
             public string VmPattern { get; set; }
             public string Dsl { get; set; }
+            public string ConnectionId { get; set; }
         }
 
 
@@ -104,11 +105,12 @@ namespace vmstats
         /// </summary>
         public class TransformSeries : IConsistentHashable
         {
-            public TransformSeries(Metric metric, Queue<Transform> transforms, Guid groupID)
+            public TransformSeries(Metric metric, Queue<Transform> transforms, Guid groupID, string connectionId)
             {
                 Measurements = metric;
                 Transforms = transforms;
                 GroupID = groupID;
+                ConnectionId = connectionId;
             }
 
             public Guid GroupID { get; private set; }
@@ -116,6 +118,7 @@ namespace vmstats
 
             public Metric Measurements { get; private set; }
             public Queue<Transform> Transforms { get; private set; }
+            public string ConnectionId { get; private set; }
         }
 
         /// <summary>
@@ -134,6 +137,7 @@ namespace vmstats
             public Guid GroupID { get; private set; }
             public string MetricName { get; private set; }
             public Queue<Transform> Transforms { get; private set; }
+            public string ConnectionId { get; set; }
         }
 
 

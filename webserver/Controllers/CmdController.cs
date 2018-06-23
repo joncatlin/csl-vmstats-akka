@@ -54,10 +54,9 @@ namespace webserver.Controllers
                 tl.DecodeAndExecute(request.Dsl, q);
 
                 // Start the processing of the pipeline by telling the MetricStoreManager to start
-                var foundActor = startup.vmstatsActorSystem.ActorSelection("**/MetricStoreManagerActor");
-                foundActor.Tell(new StartProcessingTransformPipeline(request, q));
+                var msm = startup.vmstatsActorSystem.ActorSelection("**/" + MetricStoreManagerActor.ACTOR_NAME);
+                msm.Tell(new StartProcessingTransformPipeline(request, q));
                 startup.vmstatsActorSystem.Log.Debug("Starting the processing of the transforms specified in the dsl");
-
 
             } catch (VmstatsLangException e)
             {

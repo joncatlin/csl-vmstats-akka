@@ -39,7 +39,7 @@ namespace vmstats
 
             // Route the new Metric to the next transform
             var metric = new Metric(msg.Measurements.Name + TRANSFORM_NAME_CONCATENATOR + TRANSFORM_NAME, newValues);
-            var series = new TransformSeries(metric, msg.Transforms, msg.GroupID);
+            var series = new TransformSeries(metric, msg.Transforms, msg.GroupID, msg.ConnectionId);
             RouteTransform(series);
         }
 

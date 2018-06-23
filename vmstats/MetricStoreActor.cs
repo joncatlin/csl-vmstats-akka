@@ -60,6 +60,7 @@ namespace vmstats
                 ProcessUpsertMetric(um);
                 SaveSnapshot(_metricStore);
             }));
+
             Command<SaveSnapshotSuccess>(success => {
                 // soft-delete the journal up until the sequence # at
                 // which the snapshot was taken
@@ -70,9 +71,11 @@ namespace vmstats
                 DeleteSnapshots(snapSelectCrit);
                 _log.Info($"Save snapshot successful for actor id={PersistenceId}");
             });
+
             Command<SaveSnapshotFailure>(failure => {
                 _log.Error($"ERROR: Failed to save snapshot for actor with id={PersistenceId}");
             });
+
             Command<Messages.BuildTransformSeries>(msg => ProcessPipeline(msg));
         }
 
@@ -85,7 +88,7 @@ namespace vmstats
             if (metric != null)
             {
                 // Create a start transform message and submit it to the first transform in the queue
-                var msg = new Messages.TransformSeries(metric, cmd.Transforms, cmd.GroupID);
+                var msg = new Messages.TransformSeries(metric, cmd.Transforms, cmd.GroupID, cmd.ConnectionId);
 
                 BaseTransformActor.RouteTransform(msg);
             }
@@ -93,7 +96,7 @@ namespace vmstats
             {
                 // ERROR the requested metric does not exist in this actor
                 var json = JsonConvert.SerializeObject(_metricStore.metrics.Keys);
-                _log.Error($"ERROR: Received ProcessPipeline ciommand for a metric that does not exist. Mteric requested is: {cmd.MetricName}. Available metrics are: {json}");
+                _log.Error($"ERROR: Received ProcessPipeline command for a metric that does not exist. Metric requested is: {cmd.MetricName}. Available metrics are: {json}");
             }
         }
 
