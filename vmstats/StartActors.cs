@@ -93,6 +93,14 @@ namespace vmstats
             Props rspProps = Props.Create(() => new RemoveSpikeActor()).WithRouter(new RoundRobinPool(5));
             IActorRef rsp = vmstatsActorSystem.ActorOf(rspProps, "Transforms-" + RemoveSpikeActor.TRANSFORM_NAME.ToUpper());
 
+            // Create the PercentizeActor actor pool
+            Props pctProps = Props.Create(() => new PercentizeActor()).WithRouter(new RoundRobinPool(5));
+            IActorRef pct = vmstatsActorSystem.ActorOf(pctProps, "Transforms-" + PercentizeActor.TRANSFORM_NAME.ToUpper());
+
+            // Create the CombineTransformActor actor pool
+            Props comProps = Props.Create(() => new CombineTransformActor()).WithRouter(new ConsistentHashingPool(5));
+            IActorRef com = vmstatsActorSystem.ActorOf(pctProps, "Transforms-" + CombineTransformActor.TRANSFORM_NAME.ToUpper());
+
             // Create the metric dispatcher
             Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor());
             IActorRef metricAccumulatorDispatcherActor = vmstatsActorSystem.ActorOf(metricAccumulatorDispatcherProps,
@@ -150,7 +158,7 @@ namespace vmstats
             if (temp == null)
             {
                 // Log an error and exit the program
-                _log.Error($"ERROR: Missing environment variable named: {envVarName}");
+                Console.WriteLine($"ERROR: Missing environment variable named: {envVarName}");
                 System.Environment.Exit(-1);
             }
 

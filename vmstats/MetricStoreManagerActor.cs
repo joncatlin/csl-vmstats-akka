@@ -58,6 +58,10 @@ namespace vmstats
         {
             HttpClient client = null;
 
+
+            var json = JsonConvert.SerializeObject(msg);
+            _log.Debug($"Returning result to vmstatsGUI. Result is: {json}");
+
             try
             {
                 // Contact the vmstatsgui webserver and send it the details or the completed transform pipeline
@@ -75,7 +79,7 @@ namespace vmstats
                 HttpResponseMessage response = await client.PostAsync(guiWebserverUrl, new StringContent(postBody, Encoding.UTF8, "application/json"));
                 if (response.IsSuccessStatusCode)
                 {
-                    _log.Debug("Successfully returned the result of a transform seriues to the vmstatsGUI.");
+                    _log.Info("Successfully returned the result of a transform seriues to the vmstatsGUI.");
                 }
                 else
                 {

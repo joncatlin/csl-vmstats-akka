@@ -32,7 +32,6 @@ namespace vmstats
             var ctx = Context.ActorSelection(path);
             ctx.Tell(series);
 
-
             //"akka://vmstats/user/Transforms-RBN"
         }
 

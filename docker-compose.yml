@@ -11,5 +11,6 @@ services:
     restart: always
     environment:
       VMNAME_PATTERN: "V-.*"
+      VMSTATSGUI_WEBSERVER_URL: "docker01.dest.internal:8081"
     ports:
       - "8080:80"

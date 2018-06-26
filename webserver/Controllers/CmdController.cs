@@ -8,6 +8,7 @@ using vmstats.lang;
 using vmstats;
 using static vmstats.Messages;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace webserver.Controllers
 {
@@ -45,7 +46,8 @@ namespace webserver.Controllers
         [HttpPost]
         public ActionResult<CreatedAtRouteResult> Post([FromBody] vmstats.Messages.ProcessCommand request)
         {
-            _log.LogDebug("Received request Post");
+            var jsonRequest = JsonConvert.SerializeObject(request);
+            _log.LogDebug($"Received request Post. Request is: {jsonRequest}");
             try
             {
                 // Validate the dsl
@@ -61,11 +63,15 @@ namespace webserver.Controllers
             } catch (VmstatsLangException e)
             {
                 startup.vmstatsActorSystem.Log.Error($"Error processing DSL in request. Message is: {e.Message}");
-                return BadRequest($"Error processing DSL in request. Message: " + e.Message);
+                var errorMsg = $"Error processing DSL in request. Message: {e.Message}";
+                _log.LogError(errorMsg);
+                return BadRequest(errorMsg);
             } catch (Exception e)
             {
                 startup.vmstatsActorSystem.Log.Error($"Error processing DSL in request. Message is: {e.Message}");
-                return BadRequest($"Error processing DSL in request. Message: " + e.Message);
+                var errorMsg = $"Error processing DSL in request. Message: {e.Message}";
+                _log.LogError(errorMsg);
+                return BadRequest(errorMsg);
             }
 
             return Ok();
