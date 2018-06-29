@@ -88,15 +88,15 @@ namespace vmstats
             }
             catch (HttpRequestException hre)
             {
-                _log.Error($"ERROR Calling vmstatsgui webserver. Error is: {hre.Message}");
+                _log.Error($"ERROR Calling vmstatsgui webserver. Error is: {hre.Message}. The URI used is {guiWebserverUrl}");
             }
             catch (TaskCanceledException tce)
             {
-                _log.Error($"ERROR Calling vmstatsgui webserver. Error is: {tce.Message}");
+                _log.Error($"ERROR Calling vmstatsgui webserver. Error is: {tce.Message}. The URI used is {guiWebserverUrl}");
             }
             catch (Exception ex)
             {
-                _log.Error($"ERROR Calling vmstatsgui webserver. Error is: {ex.Message} ");
+                _log.Error($"ERROR Calling vmstatsgui webserver. Error is: {ex.Message}. The URI used is {guiWebserverUrl}");
             }
             finally
             {
@@ -168,25 +168,27 @@ namespace vmstats
                     // Pass the clients connection Id to the series so that it know why client to send the results to
                     series.ConnectionId = msg.cmd.ConnectionId;
 
+                    var actorPath = "/user/MetricStore/" + actorName;
                     try
                     {
-                        // The Metric Store may not be active so activeate it
+                        /*
+                        // The Metric Store may not be active so activate it
                         var actor = Context.ActorOf(Props.Create(() =>
                             new MetricStoreActor(id.VmName, id.Date)), actorName);
-
-                        _log.Debug($"Telling new metric stored named: {actorName} to start processing a transform pipeline: {JsonConvert.SerializeObject(series)}");
-                        actor.Tell(series);
+*/
+                        // IGNORE THIS. If the actor already exists then get its context by looking it up and sending it the messge.
+                        var foundActor = Context.ActorSelection(actorPath);
+                        foundActor.Tell(series);
+                        _log.Debug($"Telling existing metric stored named: {actorPath} to start processing a transform pipeline: {JsonConvert.SerializeObject(series)}");
+                        
                     }
                     catch (InvalidActorNameException)
                     {
-                        // IGNORE THIS. If the actor already exists then get its context by looking it up and sending it the messge.
-                        var foundActor = Context.ActorSelection("**/" + actorName);
-                        foundActor.Tell(series);
-                        _log.Debug($"Telling existing metric stored named: {actorName} to start processing a transform pipeline: {JsonConvert.SerializeObject(series)}");
+                        _log.Error($"Actor named: {actorPath} to start processing a transform pipeline: {JsonConvert.SerializeObject(series)}");
                     }
                     catch (Exception)
                     {
-                        _log.Error($"Execption thrown while trying to communicate to actor: {actorName}. Pipeline: {JsonConvert.SerializeObject(series)}");
+                        _log.Error($"Exception thrown while trying to communicate to actor: {actorPath}. Pipeline: {JsonConvert.SerializeObject(series)}");
                     }
                 }
             }
