@@ -76,6 +76,9 @@ namespace vmstats
         {
             Boolean noFilesFound = true;
 
+            // TODO keep track of the files to prevent this routine from discovering the same file and sending it to another FileReaderActor
+            // this should stop the errors
+
             _log.Info("Checking directory for new files");
             foreach (string file in Directory.EnumerateFiles(_dirName, "*.csv", SearchOption.TopDirectoryOnly))
             {
