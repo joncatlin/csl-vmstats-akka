@@ -3,6 +3,7 @@ using System.IO;
 using Akka.Actor;
 using Akka.Routing;
 using Akka.Event;
+using System.Collections.Generic;
 
 namespace vmstats
 {
@@ -34,6 +35,8 @@ namespace vmstats
         private IActorRef _fileReaderActor;
         private IActorRef _metricAccumulatorDispatcherActor;
         private ILoggingAdapter _log;
+        private Dictionary<string, int> foundFiles = new Dictionary<string, int>();
+        enum State { FoundOnce, FoundMultiple, Delete };
 
 
         public DirectoryWatcherActor(string vmNamePattern, IActorRef metricDispatcher)
@@ -76,8 +79,11 @@ namespace vmstats
         {
             Boolean noFilesFound = true;
 
-            // TODO keep track of the files to prevent this routine from discovering the same file and sending it to another FileReaderActor
-            // this should stop the errors
+            // Reset the set of foundFiles so it is obvious which ones have gone
+            foreach (KeyValuePair<string, int>entry in foundFiles)
+            {
+                foundFiles[entry.Key] = (int)State.Delete;
+            }
 
             _log.Info("Checking directory for new files");
             foreach (string file in Directory.EnumerateFiles(_dirName, "*.csv", SearchOption.TopDirectoryOnly))
@@ -86,8 +92,26 @@ namespace vmstats
 
                 _log.Info("Found file {0}", file);
 
-                // Start an actor in the pool to deal with the new file
-                _fileReaderActor.Tell(new FileReaderActor.Process(file));
+                // See if the file has already been found
+                if (!foundFiles.ContainsKey(file))
+                {
+                    // Start an actor in the pool to deal with the new file
+                    _fileReaderActor.Tell(new FileReaderActor.Process(file));
+
+                    // Add the file to the set of found files
+                    foundFiles.Add(file, (int)State.FoundOnce);
+                }
+                else
+                {
+                    foundFiles[file] = (int)State.FoundMultiple;
+                }
+            }
+
+            // For each file in the set of foundFiles that has the state of Delete then remove the item
+            // from the set
+            foreach (KeyValuePair<string, int> entry in foundFiles)
+            {
+                if (entry.Value == (int)State.Delete) foundFiles.Remove(entry.Key);
             }
 
             if (noFilesFound)

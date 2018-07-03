@@ -24,7 +24,7 @@ namespace vmstats
         private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
         // The store for all the metrics found and their date ranges
-        private Dictionary<string, SortedDictionary<long, string>> AvailableMetrics = new Dictionary<string, SortedDictionary<long, string>>();
+        private Dictionary<string, SortedDictionary<long, int>> AvailableMetrics = new Dictionary<string, SortedDictionary<long, int>>();
 
         // The place where the snapshots are stored
         private readonly string SnapshotPath;
@@ -222,24 +222,37 @@ namespace vmstats
                 // Extract the elements from the name of the file
                 var vmName = match.Groups["vmname"].Value;
                 var snapshotDate = match.Groups["date"].Value;
-                var snapshotId = match.Groups["id"].Value;
+                var snapshotId = Convert.ToInt32(match.Groups["id"].Value);
 
                 // Save the information for use later
-                SortedDictionary<long, string> dates;
+                SortedDictionary<long, int> dates;
                 AvailableMetrics.TryGetValue(vmName, out dates);
 
                 if (dates == null)
                 {
                     // Create an entry for the vm and date
                     long dateLong = Convert.ToDateTime(snapshotDate).Ticks;
-                    var sd = new SortedDictionary<long, string>();
+                    var sd = new SortedDictionary<long, int>();
                     sd.Add(Convert.ToDateTime(snapshotDate).Ticks, snapshotId);
                     AvailableMetrics.Add(vmName, sd);
                 }
                 else
                 {
-                    // Add the date the tthe existing vmname set of them
-                    dates.TryAdd(Convert.ToDateTime(snapshotDate).Ticks, snapshotId);
+                    var time = Convert.ToDateTime(snapshotDate).Ticks;
+
+                    // Add the date to the existing vmname set of them
+                    if (!dates.TryAdd(time, snapshotId))
+                    {
+                        // If the file already exists then we have a duplicate snaposhot that
+                        // needs to be purged
+                        if (dates[time] > snapshotId)
+                        {
+                            // Purge the file just found
+                        } else
+                        {
+                            // Purge the file that was found previously
+                        }
+                    }
                 }
 
                 _log.Info($"Found file named: {filename} and added it to the AvailableMetrics.");
@@ -251,44 +264,22 @@ namespace vmstats
             return false;
         }
 
-        /*
-                private void StartFileWatcher() { 
-                    var fileSystemWatcher = new FileSystemWatcher();
 
-                    // Associate event handlers with the events
-                    fileSystemWatcher.Created += FileSystemWatcher_Created;
-        //            fileSystemWatcher.Changed += FileSystemWatcher_Changed;
-        //            fileSystemWatcher.Deleted += FileSystemWatcher_Deleted;
-        //            fileSystemWatcher.Renamed += FileSystemWatcher_Renamed;
+        private void PurgeSnapshot(string filename)
+        {
+            // Delete file
+            int x = 0;
 
-                    // Set the path of the directory to watch
-                    fileSystemWatcher.Path = SnapshotPath;
+            File.Delete(Path.Combine(SnapshotPath, filename));
+        }
 
-                    // Start event notification
-                    fileSystemWatcher.EnableRaisingEvents = true;
-                }
 
-                private void FileSystemWatcher_Renamed(object sender, RenamedEventArgs e)
-                {
-                    Console.WriteLine("Hello");
-                }
-
-                private void FileSystemWatcher_Deleted(object sender, FileSystemEventArgs e)
-                {
-                    Console.WriteLine("Hello");
-                }
-
-                private void FileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
-                {
-                    Console.WriteLine("Hello");
-                }
-
-                private void FileSystemWatcher_Created(object sender, FileSystemEventArgs e)
-                {
-                    _log.Info($"New file detected in snapshot directory. File name is: {e.Name}.");
-                    AddFileToAvailableMetrics(e.Name);
-                }
-                */
+        private void PurgeSnapshot(string vmname, long time, int snapshotId)
+        {
+            // Delete file
+            int x = 0;
+//            @"^snapshot-MetricStore%.*(?<vmname>V.*)%.*(?<date>\d{2}-\d{2}-\d{4})-(?<id>\d*)-\d*$";
+        }
 
     }
 }
