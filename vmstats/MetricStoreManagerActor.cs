@@ -24,7 +24,7 @@ namespace vmstats
         private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
         // The store for all the metrics found and their date ranges
-        private Dictionary<string, SortedDictionary<long, int>> AvailableMetrics = new Dictionary<string, SortedDictionary<long, int>>();
+        private Dictionary<string, SortedDictionary<long, long>> AvailableMetrics = new Dictionary<string, SortedDictionary<long, long>>();
 
         // The place where the snapshots are stored
         private readonly string SnapshotPath;
@@ -34,9 +34,6 @@ namespace vmstats
         {
             // Find out how many MetircStores have been created
             FindAvailableMetrics();
-
-            // Start a filewatcher on the snapshot directory to be notified whenever a new file is created
-//            StartFileWatcher();
 
             // Log list of found stores
             var stores = JsonConvert.SerializeObject(AvailableMetrics);
@@ -50,9 +47,33 @@ namespace vmstats
             this.guiWebserverUrl = guiWebserverUrl;
 
             Receive<Messages.StartProcessingTransformPipeline>(msg => Process(msg));
-            Receive<Messages.FindMetricStoreActorNames>(msg => Find(msg));
+            // TODO tidy up and remove this code and the method definition
+            //            Receive<Messages.FindMetricStoreActorNames>(msg => Find(msg));
             Receive<Messages.TransformSeries>(msg => ReturnResult(msg));
+            Receive<Messages.PotentialNewActor>(msg => AddMetricStoreActor(msg));
         }
+
+
+        private void AddMetricStoreActor(Messages.PotentialNewActor msg)
+        {
+            // Save the information for use later
+            SortedDictionary<long, long> dates;
+            AvailableMetrics.TryGetValue(msg.VmName, out dates);
+
+            if (dates == null)
+            {
+                // New Actor!
+                var sd = new SortedDictionary<long, long>();
+                sd.Add(Convert.ToDateTime(msg.Date).Ticks, msg.SeqNr);
+                AvailableMetrics.Add(msg.VmName, sd);
+            }
+            else
+            {
+                // Check to see if the date is new
+                dates.TryAdd(Convert.ToDateTime(msg.Date).Ticks, msg.SeqNr);
+            }
+        }
+
 
         private async void ReturnResult(Messages.TransformSeries msg)
         {
@@ -108,6 +129,7 @@ namespace vmstats
             }
         }
 
+        /*
         private void Find(Messages.FindMetricStoreActorNames msg)
         {
             _log.Info($"Processing FindMetricStoreActorNames");
@@ -115,7 +137,7 @@ namespace vmstats
             var json = JsonConvert.SerializeObject(AvailableMetrics);
             _log.Debug($"Processed FindMetricStoreActorNames msg. AvailableMetrics found: {json}");
         }
-
+*/
         internal class ActorID{
             public string VmName { get; private set; }
             public string Date { get; private set; }
@@ -222,17 +244,17 @@ namespace vmstats
                 // Extract the elements from the name of the file
                 var vmName = match.Groups["vmname"].Value;
                 var snapshotDate = match.Groups["date"].Value;
-                var snapshotId = Convert.ToInt32(match.Groups["id"].Value);
+                var snapshotId = Convert.ToInt64(match.Groups["id"].Value);
 
                 // Save the information for use later
-                SortedDictionary<long, int> dates;
+                SortedDictionary<long, long> dates;
                 AvailableMetrics.TryGetValue(vmName, out dates);
 
                 if (dates == null)
                 {
                     // Create an entry for the vm and date
                     long dateLong = Convert.ToDateTime(snapshotDate).Ticks;
-                    var sd = new SortedDictionary<long, int>();
+                    var sd = new SortedDictionary<long, long>();
                     sd.Add(Convert.ToDateTime(snapshotDate).Ticks, snapshotId);
                     AvailableMetrics.Add(vmName, sd);
                 }

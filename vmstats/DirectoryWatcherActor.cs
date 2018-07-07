@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace vmstats
 {
-    class DirectoryWatcherActor : UntypedActor
+    class DirectoryWatcherActor : ReceiveActor
     {
         #region Message classes
         public class InitializeCommand
@@ -23,7 +23,7 @@ namespace vmstats
         }
 
 
-        public const string CheckDirCommand = "check directory";
+        public class CheckDirCommand { };
         #endregion
 
         #region Local variables
@@ -44,6 +44,9 @@ namespace vmstats
             _log = Context.GetLogger();
             this.vmNamePattern = vmNamePattern;
             _metricAccumulatorDispatcherActor = metricDispatcher;
+
+            Receive<InitializeCommand>(msg => Initialize(msg));
+            Receive<CheckDirCommand>(msg => ProcessCheckDir());
         }
 
 
@@ -57,22 +60,12 @@ namespace vmstats
         }
 
 
-        protected override void OnReceive(object message)
+        private void Initialize(InitializeCommand msg)
         {
-            if (message is InitializeCommand)
-            {
-                var msg = message as InitializeCommand;
-                _fileType = msg.fileType;
-                _dirName = msg.dirName;
-                _log.Info("Initialize received with dirName={0}, fileType={1}", _dirName, _fileType);
-
-            }
-            else if (message is CheckDirCommand)
-            {
-                ProcessCheckDir();
-            }
+            _fileType = msg.fileType;
+            _dirName = msg.dirName;
+            _log.Info("Initialize received with dirName={0}, fileType={1}", _dirName, _fileType);
         }
-
 
         // Find any files in the directory
         private void ProcessCheckDir()
@@ -80,9 +73,10 @@ namespace vmstats
             Boolean noFilesFound = true;
 
             // Reset the set of foundFiles so it is obvious which ones have gone
-            foreach (KeyValuePair<string, int>entry in foundFiles)
+            var keyList = new List<string>(foundFiles.Keys);
+            foreach (var key in keyList)
             {
-                foundFiles[entry.Key] = (int)State.Delete;
+                foundFiles[key] = (int)State.Delete;
             }
 
             _log.Info("Checking directory for new files");
@@ -109,9 +103,10 @@ namespace vmstats
 
             // For each file in the set of foundFiles that has the state of Delete then remove the item
             // from the set
-            foreach (KeyValuePair<string, int> entry in foundFiles)
+            keyList = new List<string>(foundFiles.Keys);
+            foreach (var key in keyList)
             {
-                if (entry.Value == (int)State.Delete) foundFiles.Remove(entry.Key);
+                if (foundFiles[key] == (int)State.Delete) foundFiles.Remove(key);
             }
 
             if (noFilesFound)

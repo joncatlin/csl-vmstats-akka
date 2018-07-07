@@ -69,6 +69,12 @@ namespace vmstats
                 // Delete all previous snapshots so we only keep the latest one
                 var snapSelectCrit = new SnapshotSelectionCriteria(success.Metadata.SequenceNr - 1, success.Metadata.Timestamp, 0, new DateTime(0));
                 DeleteSnapshots(snapSelectCrit);
+
+                // Send a msg to the MetricStoreManager to inform it of a potentially new MetricStoreActor
+                var actorPath = "/user/" + MetricStoreManagerActor.ACTOR_NAME + "/";
+                var foundActor = Context.ActorSelection(actorPath);
+                foundActor.Tell(new Messages.PotentialNewActor(_metricStore.vmName, _metricStore.date, success.Metadata.SequenceNr));
+
                 _log.Info($"Save snapshot successful for actor id={PersistenceId}");
             });
 

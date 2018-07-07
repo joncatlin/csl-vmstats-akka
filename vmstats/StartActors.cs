@@ -121,7 +121,7 @@ namespace vmstats
             vmstatsActorSystem.Scheduler
                .ScheduleTellRepeatedly(TimeSpan.FromSeconds(0),
                          TimeSpan.FromSeconds(30),
-                          directoryWatcherActor, DirectoryWatcherActor.CheckDirCommand, ActorRefs.NoSender);
+                          directoryWatcherActor, new DirectoryWatcherActor.CheckDirCommand(), ActorRefs.NoSender);
             _log.Debug("Scheduling the directoryWatcherActor with CheckDirCommand");
 
             // Create the MetricStoreManagerActor
@@ -130,15 +130,14 @@ namespace vmstats
                 MetricStoreManagerActor.ACTOR_NAME);
             _log.Debug("Creating the MetricStoreManagerActor");
 
+            /*
             // Schedule the MetricStoreManager to check for new MetricStores
             vmstatsActorSystem.Scheduler
                .ScheduleTellRepeatedly(TimeSpan.FromSeconds(0),
                          TimeSpan.FromSeconds(30),
                           managerActor, new Messages.FindMetricStoreActorNames(), ActorRefs.NoSender);
             _log.Debug("Scheduling the MetricStoreManager with FindMetricStoreActorNames");
-
-            // Wait until actor system terminated
-            //            vmstatsActorSystem.WhenTerminated.Wait();
+*/
         }
 
         private void GetEnvironmentVariables ()

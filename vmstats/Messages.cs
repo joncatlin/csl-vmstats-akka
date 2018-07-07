@@ -52,6 +52,22 @@ namespace vmstats
             }
         }
 
+        /// <summary>
+        /// Message sent to inform of a potentially new MetricStoreActor in the system
+        /// </summary>
+        public class PotentialNewActor
+        {
+            public string VmName { get; private set; }
+            public string Date { get; private set; }
+            public long SeqNr { get; private set; }
+
+            public PotentialNewActor(string vmName, string date, long seqNr)
+            {
+                VmName = vmName;
+                Date = date;
+                SeqNr = seqNr;
+            }
+        }
 
         /// <summary>
         /// Message sent from the client requesting a transform pipeline be built and executed.
