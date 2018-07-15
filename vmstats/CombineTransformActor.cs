@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Akka.Actor;
-using Akka.Event;
-using vmstats;
-using static vmstats.Messages;
+using vmstats_shared;
 
 namespace vmstats
 {
@@ -21,15 +18,15 @@ namespace vmstats
         public static readonly string COUNT = "C";
 
         // The store to hold the transforms in pending receiving all of them to be be combined
-        Dictionary<Guid, List<TransformSeries>> TransformSereiesHoldingStore = new Dictionary<Guid, List<TransformSeries>>();
+        Dictionary<Guid, List<Messages.TransformSeries>> TransformSereiesHoldingStore = new Dictionary<Guid, List<Messages.TransformSeries>>();
 
         public CombineTransformActor()
         {
-            Receive<TransformSeries>(msg => ProcessRequest(msg));
+            Receive<Messages.TransformSeries>(msg => ProcessRequest(msg));
         }
 
 
-        private void ProcessRequest(TransformSeries msg)
+        private void ProcessRequest(Messages.TransformSeries msg)
         {
             _log.Debug($"Received transform series for combining. GroupID: {msg.GroupID}");
 
@@ -51,7 +48,7 @@ namespace vmstats
                     var metric = Combine(storedTransforms);
 
                     // Route the result of the combine transform
-                    var series = new TransformSeries(metric, msg.Transforms, msg.GroupID, msg.ConnectionId);
+                    var series = new Messages.TransformSeries(metric, msg.Transforms, msg.GroupID, msg.ConnectionId);
                     RouteTransform(series);
                 }
                 else
@@ -67,14 +64,14 @@ namespace vmstats
                 _log.Debug($"This is the first transform with GroupID: {msg.GroupID}. Storing it and awaiting the rest.");
 
                 // There are no entries for this TransformSeries, this is the first one
-                var list = new List<TransformSeries>();
+                var list = new List<Messages.TransformSeries>();
                 list.Add(msg);
             }
 
         }
 
 
-        private Metric Combine(List<TransformSeries> transforms)
+        private Metric Combine(List<Messages.TransformSeries> transforms)
         {
             var combinedValues = new SortedDictionary<long, float>();
 

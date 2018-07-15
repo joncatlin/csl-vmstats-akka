@@ -27,6 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="vmstats-shared">
+      <HintPath>..\vmstats-shared.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Vmstats.g4">
       <Generator>MSBuild:Compile</Generator>
     </None>

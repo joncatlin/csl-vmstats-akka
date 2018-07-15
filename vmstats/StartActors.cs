@@ -69,6 +69,10 @@ namespace vmstats
             }
 
             string textConfig = File.ReadAllText(configFile);
+
+            //            textConfig.Replace("$$PATH_REPLACE$$", snapshotPath);
+
+            // Get the akka configuration
             var config = ConfigurationFactory.ParseString(textConfig);
 
             // Create the container for all the actors
@@ -102,9 +106,9 @@ namespace vmstats
             IActorRef com = vmstatsActorSystem.ActorOf(pctProps, "Transforms-" + CombineTransformActor.TRANSFORM_NAME.ToUpper());
 
             // Create the metric dispatcher
-            Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor());
+            Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor(snapshotPath, guiWebserUrl));
             IActorRef metricAccumulatorDispatcherActor = vmstatsActorSystem.ActorOf(metricAccumulatorDispatcherProps,
-                "metricAccumulatorDispatcherActor");
+                MetricAccumulatorDispatcherActor.ACTOR_NAME);
             _log.Debug("Creating the metricAccumulatorDispatcherActor");
 
             // Create the actor that will watch the directory for new files being added
@@ -125,11 +129,12 @@ namespace vmstats
             _log.Debug("Scheduling the directoryWatcherActor with CheckDirCommand");
 
             // Create the MetricStoreManagerActor
+            /*
             Props managerProps = Props.Create(() => new MetricStoreManagerActor(snapshotPath, guiWebserUrl));
             IActorRef managerActor = vmstatsActorSystem.ActorOf(managerProps,
                 MetricStoreManagerActor.ACTOR_NAME);
             _log.Debug("Creating the MetricStoreManagerActor");
-
+            */
             /*
             // Schedule the MetricStoreManager to check for new MetricStores
             vmstatsActorSystem.Scheduler

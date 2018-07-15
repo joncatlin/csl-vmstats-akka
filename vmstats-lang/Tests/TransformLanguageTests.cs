@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using Akka.TestKit.NUnit3;
 using Akka.Actor;
-using vmstats;
-using Akka.Configuration;
 using Newtonsoft.Json;
 using System;
-using Antlr4.Runtime;
-using static vmstats.Messages;
+using vmstats_shared;
 
 namespace vmstats.lang.Tests
 {
@@ -33,7 +29,7 @@ namespace vmstats.lang.Tests
 
             // Create a collection to hold all of the transform_pipelines found by the listener when we
             // decode the DSL.
-            Queue<BuildTransformSeries> result = new Queue<BuildTransformSeries>();
+            Queue<Messages.BuildTransformSeries> result = new Queue<Messages.BuildTransformSeries>();
 
             // translate the DSL in the test text and execute the tranform pipeline it represents
             var tp = new TransformationLanguage(sys.Log);
@@ -58,21 +54,21 @@ namespace vmstats.lang.Tests
                 );
         }
 
-        public Queue<BuildTransformSeries> generateTestData_When_DSLWithTwoTransformsAndSingleParameterUsed_Expect_SingleValidTransformPipelineBuilt()
+        public Queue<Messages.BuildTransformSeries> generateTestData_When_DSLWithTwoTransformsAndSingleParameterUsed_Expect_SingleValidTransformPipelineBuilt()
         {
             // Create the data for the test
             var metricName = "CPUMAX";
-            var transforms = new Queue<Transform>();
+            var transforms = new Queue<Messages.Transform>();
             Guid groupID = new Guid();
 
             var parameters = new Dictionary<string, string>();
             parameters.Add(RemoveSpikeActor.SPIKE_WINDOW_LENGTH, "3");
 
-            transforms.Enqueue(new Transform(RemoveBaseNoiseActor.TRANSFORM_NAME, new Dictionary<string, string>()));
-            transforms.Enqueue(new Transform(RemoveSpikeActor.TRANSFORM_NAME, parameters));
+            transforms.Enqueue(new Messages.Transform(RemoveBaseNoiseActor.TRANSFORM_NAME, new Dictionary<string, string>()));
+            transforms.Enqueue(new Messages.Transform(RemoveSpikeActor.TRANSFORM_NAME, parameters));
 
-            var q = new Queue<BuildTransformSeries>();
-            q.Enqueue(new BuildTransformSeries(metricName, transforms, groupID));
+            var q = new Queue<Messages.BuildTransformSeries>();
+            q.Enqueue(new Messages.BuildTransformSeries(metricName, transforms, groupID));
             return q;
         }
 
@@ -90,7 +86,7 @@ namespace vmstats.lang.Tests
 
             // Create a collection to hold all of the transform_pipelines found by the listener when we
             // decode the DSL.
-            Queue<BuildTransformSeries> result = new Queue<BuildTransformSeries>();
+            Queue<Messages.BuildTransformSeries> result = new Queue<Messages.BuildTransformSeries>();
 
             // translate the DSL in the test text and execute the tranform pipeline it represents
             var tp = new TransformationLanguage(sys.Log);

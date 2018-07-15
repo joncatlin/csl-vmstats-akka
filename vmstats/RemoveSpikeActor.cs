@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Akka.Actor;
-using Akka.Event;
-using vmstats;
-using static vmstats.Messages;
+using vmstats_shared;
 
 namespace vmstats
 {
@@ -20,10 +17,10 @@ namespace vmstats
 
         public RemoveSpikeActor()
         {
-            Receive<TransformSeries>(msg => CalculateTransformation(msg));
+            Receive<Messages.TransformSeries>(msg => CalculateTransformation(msg));
         }
 
-        private void CalculateTransformation(TransformSeries msg)
+        private void CalculateTransformation(Messages.TransformSeries msg)
         {
             // Get the transform from the series
             var transform = msg.Transforms.Dequeue();
@@ -107,7 +104,7 @@ namespace vmstats
             var metric = new Metric(msg.Measurements.Name + TRANSFORM_NAME_CONCATENATOR + TRANSFORM_NAME, newValues);
 
             // Route the new Metric to the next transform
-            var series = new TransformSeries(metric, msg.Transforms, msg.GroupID, msg.ConnectionId);
+            var series = new Messages.TransformSeries(metric, msg.Transforms, msg.GroupID, msg.ConnectionId);
             RouteTransform(series);
         }
     }

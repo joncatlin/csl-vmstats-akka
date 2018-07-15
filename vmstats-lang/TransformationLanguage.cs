@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Akka.Actor;
+﻿using System.Collections.Generic;
 using Akka.Event;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using Newtonsoft.Json;
-using static vmstats.Messages;
+using vmstats_shared;
 
 namespace vmstats.lang
 {
@@ -55,7 +52,7 @@ namespace vmstats.lang
         }
 */
 
-        public void DecodeAndExecute(string commandsToDecode, Queue<BuildTransformSeries> series)
+        public void DecodeAndExecute(string commandsToDecode, Queue<Messages.BuildTransformSeries> series)
         {
 /*
             try

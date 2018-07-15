@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using vmstats.lang;
 using vmstats;
-using static vmstats.Messages;
+using vmstats_shared;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace webserver.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/cmd")]
     [ApiController]
     public class CmdController : ControllerBase
     {
@@ -44,33 +41,36 @@ namespace webserver.Controllers
 
 //        [HttpPost(Name = nameof(ValidateRequest))]
         [HttpPost]
-        public ActionResult<CreatedAtRouteResult> Post([FromBody] vmstats.Messages.ProcessCommand request)
+        public ActionResult<CreatedAtRouteResult> Post([FromBody] Messages.ProcessCommand request)
         {
             var jsonRequest = JsonConvert.SerializeObject(request);
             _log.LogDebug($"Received request Post. Request is: {jsonRequest}");
             try
             {
                 // Validate the dsl
-                Queue<BuildTransformSeries> q = new Queue<BuildTransformSeries>();
+                Queue<Messages.BuildTransformSeries> q = new Queue<Messages.BuildTransformSeries>();
                 TransformationLanguage tl = new TransformationLanguage(startup._log);
                 tl.DecodeAndExecute(request.Dsl, q);
 
-                // Start the processing of the pipeline by telling the MetricStoreManager to start
-                var msm = startup.vmstatsActorSystem.ActorSelection("**/" + MetricStoreManagerActor.ACTOR_NAME);
-                msm.Tell(new StartProcessingTransformPipeline(request, q));
+                // Start the processing of the pipeline by telling the MetricAccumulatorDispatcherActor to route the request
+                var actor = startup.vmstatsActorSystem.ActorSelection("/user/" + MetricAccumulatorDispatcherActor.ACTOR_NAME);
+                actor.Tell(new Messages.StartProcessingTransformPipeline(request, q));
                 startup.vmstatsActorSystem.Log.Debug("Starting the processing of the transforms specified in the dsl");
-
-            } catch (VmstatsLangException e)
+                Console.WriteLine("Starting the processing of the transforms specified in the dsl");
+            }
+            catch (VmstatsLangException e)
             {
                 startup.vmstatsActorSystem.Log.Error($"Error processing DSL in request. Message is: {e.Message}");
                 var errorMsg = $"Error processing DSL in request. Message: {e.Message}";
                 _log.LogError(errorMsg);
+                Console.WriteLine(errorMsg);
                 return BadRequest(errorMsg);
             } catch (Exception e)
             {
                 startup.vmstatsActorSystem.Log.Error($"Error processing DSL in request. Message is: {e.Message}");
                 var errorMsg = $"Error processing DSL in request. Message: {e.Message}";
                 _log.LogError(errorMsg);
+                Console.WriteLine(errorMsg);
                 return BadRequest(errorMsg);
             }
 

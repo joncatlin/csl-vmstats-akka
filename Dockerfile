@@ -6,10 +6,6 @@ EXPOSE 80
 RUN mkdir /data
 VOLUME /data
 
-# Where to look for the configuration
-RUN mkdir /config
-VOLUME /config
-
 # Where to store the snapshots
 RUN mkdir /snapshots
 VOLUME /snapshots
@@ -18,8 +14,13 @@ VOLUME /snapshots
 RUN mkdir /logs
 VOLUME /logs
 
-COPY config.txt /config/
-COPY NLog.config /app/
+# Where to look for the configuration
+RUN mkdir /config
+VOLUME /config
+
+# Copy needed files
+COPY NLog.config .
+#COPY config.txt .
 
 # define the environment variables
 ENV DIR_NAME /data
@@ -32,15 +33,12 @@ ENV VMSTATSGUI_WEBSERVER_URL docker01.dest.internal:5000
 FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
 COPY vmstats-akka.sln ./
-COPY transforms/*.csproj ./transforms/
 COPY vmstats/*.csproj ./vmstats/
 COPY vmstats-lang/*.csproj ./vmstats-lang/
 COPY webserver/*.csproj ./webserver/
 
 RUN dotnet restore
 COPY . .
-WORKDIR /src/transforms
-RUN dotnet build -c Release -o /app
 
 WORKDIR /src/vmstats
 RUN dotnet build -c Release -o /app

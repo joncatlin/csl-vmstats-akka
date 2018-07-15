@@ -4,6 +4,7 @@ using Akka.Actor;
 using Akka.Routing;
 using Akka.Event;
 using System.Collections.Generic;
+using vmstats_shared;
 
 namespace vmstats
 {

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using Akka.Actor;
 using Akka.Event;
-using vmstats;
-using static vmstats.Messages;
+using vmstats_shared;
 
 namespace vmstats
 {
@@ -11,7 +9,7 @@ namespace vmstats
     {
         protected readonly ILoggingAdapter _log = Logging.GetLogger(Context);
 
-        public static void RouteTransform(TransformSeries series)
+        public static void RouteTransform(Messages.TransformSeries series)
         {
             // Get the name of the first transform in the series
             string path = null;
@@ -23,7 +21,7 @@ namespace vmstats
             } else
             {
                 // The queue is empty so all transforms have beenc completed so route back to the MetricStoreManager
-                path = "/user/" + MetricStoreManagerActor.ACTOR_NAME;
+                path = "/user/" + MetricAccumulatorDispatcherActor.ACTOR_NAME;
             }
 
             // Look up the actor with the name of the transform and send the transform series 

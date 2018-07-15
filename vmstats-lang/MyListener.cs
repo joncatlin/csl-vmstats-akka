@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using vmstats;
 using Akka.Event;
 using Antlr4.Runtime.Tree;
-using static vmstats.Messages;
+using vmstats_shared;
 
 namespace vmstats.lang
 {
     public class MyListener : VmstatsBaseListener
     {
         #region Instance variables
-        private Queue<Transform> transforms = new Queue<Transform>();
-        private Transform currentTransform;
+        private Queue<Messages.Transform> transforms = new Queue<Messages.Transform>();
+        private Messages.Transform currentTransform;
         private Metric currentMetric;
         private string currentMetricName;
         private string currentTransformName;
@@ -20,13 +18,13 @@ namespace vmstats.lang
         private string currentValue;
         private Dictionary<string, string> currentParameters;
         private Guid currentCombineID = Guid.NewGuid();
-        private Queue<BuildTransformSeries> series;
+        private Queue<Messages.BuildTransformSeries> series;
         private readonly ILoggingAdapter _log;
         private bool _errorFound = false;
 
         #endregion
 
-        public MyListener(ILoggingAdapter log, Queue<BuildTransformSeries>series)
+        public MyListener(ILoggingAdapter log, Queue<Messages.BuildTransformSeries>series)
         {
             _log = log;
 
@@ -45,7 +43,7 @@ namespace vmstats.lang
 
             // Create a TransformSeries out of the information collected and add it to all the 
             // transform_pipelines found so far.
-            series.Enqueue(new BuildTransformSeries(currentMetricName, transforms, currentCombineID));
+            series.Enqueue(new Messages.BuildTransformSeries(currentMetricName, transforms, currentCombineID));
         }
 
         public override void EnterTransform(VmstatsParser.TransformContext context)
@@ -62,7 +60,7 @@ namespace vmstats.lang
             Console.WriteLine("ExitTransform");
 
             // Create a transform out of the information collected and add it to the series
-            var transform = new Transform(currentTransformName, currentParameters);
+            var transform = new Messages.Transform(currentTransformName, currentParameters);
             transforms.Enqueue(transform);
         }
 

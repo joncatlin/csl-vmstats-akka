@@ -10,7 +10,11 @@ services:
       - "/mount/general-data/vmstats-logs/:/logs"
     restart: always
     environment:
-      VMNAME_PATTERN: "V-.*"
-      VMSTATSGUI_WEBSERVER_URL: "http://192.168.15.241:54337"
+      VMNAME_PATTERN: "V-BWill.*"
+      VMSTATSGUI_WEBSERVER_URL: "http://docker01.dest.internal:8081/vmstats/ReturnResultToClient"
+      DIR_NAME: "/data"
+      FILE_TYPE: "*.csv"
+      CONFIG_FILE: "/config/config.txt"
+      SNAPSHOT_PATH: "/snapshots"
     ports:
       - "8080:80"

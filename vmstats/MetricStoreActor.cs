@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Akka.Actor;
 using Akka.Persistence;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Collections;
 using Akka.Event;
+using vmstats_shared;
 using Newtonsoft.Json;
 
 namespace vmstats
@@ -71,9 +67,9 @@ namespace vmstats
                 DeleteSnapshots(snapSelectCrit);
 
                 // Send a msg to the MetricStoreManager to inform it of a potentially new MetricStoreActor
-                var actorPath = "/user/" + MetricStoreManagerActor.ACTOR_NAME + "/";
-                var foundActor = Context.ActorSelection(actorPath);
-                foundActor.Tell(new Messages.PotentialNewActor(_metricStore.vmName, _metricStore.date, success.Metadata.SequenceNr));
+//                var actorPath = "/user/" + MetricStoreManagerActor.ACTOR_NAME + "/";
+//                var foundActor = Context.ActorSelection(actorPath);
+//                foundActor.Tell(new Messages.PotentialNewActor(_metricStore.vmName, _metricStore.date, success.Metadata.SequenceNr));
 
                 _log.Info($"Save snapshot successful for actor id={PersistenceId}");
             });

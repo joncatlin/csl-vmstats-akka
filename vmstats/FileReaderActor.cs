@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Akka.Actor;
 using System.IO;
 using System.Text.RegularExpressions;
 using Akka.Event;
+using vmstats_shared;
 
 namespace vmstats
 {
