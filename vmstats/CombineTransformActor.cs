@@ -48,7 +48,7 @@ namespace vmstats
                     var metric = Combine(storedTransforms);
 
                     // Route the result of the combine transform
-                    var series = new Messages.TransformSeries(metric, msg.Transforms, msg.GroupID, msg.ConnectionId);
+                    var series = new Messages.TransformSeries(metric, msg.Transforms, msg.GroupID, msg.ConnectionId, msg.VmName, msg.VmDate);
                     RouteTransform(series);
                 }
                 else

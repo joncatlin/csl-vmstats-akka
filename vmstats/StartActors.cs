@@ -70,7 +70,7 @@ namespace vmstats
 
             string textConfig = File.ReadAllText(configFile);
 
-            //            textConfig.Replace("$$PATH_REPLACE$$", snapshotPath);
+//            textConfig = textConfig.Replace("$$PATH_REPLACE$$", snapshotPath);
 
             // Get the akka configuration
             var config = ConfigurationFactory.ParseString(textConfig);

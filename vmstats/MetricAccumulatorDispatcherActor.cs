@@ -264,7 +264,10 @@ namespace vmstats
                     // Pass the clients connection Id to the series so that it knows which client to send the results to
                     series.ConnectionId = msg.cmd.ConnectionId;
 
-                    id.Tell(series);
+                    // Clone the series so they are distinct from one another
+                    var newseries = series.Clone();
+
+                    id.Tell(newseries);
                     _log.Debug($"Telling existing metric stored named: {id.Path} to start processing a transform pipeline: {JsonConvert.SerializeObject(series)}");
                 }
             }
@@ -274,7 +277,6 @@ namespace vmstats
         private async void ReturnResult(Messages.TransformSeries msg)
         {
             HttpClient client = null;
-
 
             var json = JsonConvert.SerializeObject(msg);
             _log.Debug($"Returning result to vmstatsGUI. Message received is: {json}");
@@ -290,7 +292,10 @@ namespace vmstats
                 new MediaTypeWithQualityHeaderValue("application/json"));
 
                 // Create a new ProcessCommand with the supplied data
-                var result = new Messages.Result(msg.ConnectionId, msg.Measurements.Values.Keys.ToArray(), msg.Measurements.Values.Values.ToArray());
+                // TODO plumb the vmname and date throughout the chain so it gets back to the client
+                bool isRaw = (msg.GroupID == Guid.Empty) ? true : false;
+                var result = new Messages.Result(msg.ConnectionId, msg.Measurements.Values.Keys.ToArray(), msg.Measurements.Values.Values.ToArray(), 
+                    isRaw, msg.VmName, msg.VmDate, msg.Measurements.Name);
                 string postBody = JsonConvert.SerializeObject(result);
                 _log.Debug($"Returning result to vmstatsGUI. Result is: {postBody}");
 

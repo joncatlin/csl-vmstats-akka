@@ -90,9 +90,13 @@ namespace vmstats
             if (metric != null)
             {
                 // Create a start transform message and submit it to the first transform in the queue
-                var msg = new Messages.TransformSeries(metric, cmd.Transforms, cmd.GroupID, cmd.ConnectionId);
-
+                var msg = new Messages.TransformSeries(metric, cmd.Transforms, cmd.GroupID, cmd.ConnectionId, _metricStore.vmName, _metricStore.date);
                 BaseTransformActor.RouteTransform(msg);
+
+                // Create the message to return the raw un transformed data back to the client
+                var rawMsg = new Messages.TransformSeries(metric, new Queue<Messages.Transform>(), Guid.Empty, cmd.ConnectionId, 
+                    _metricStore.vmName, _metricStore.date);
+                BaseTransformActor.RouteTransform(rawMsg);
             }
             else
             {

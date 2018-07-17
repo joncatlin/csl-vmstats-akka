@@ -30,8 +30,9 @@ akka.persistence.snapshot-store.local {
     stream-dispatcher = "akka.persistence.dispatchers.default-stream-dispatcher"
 
     # Storage location of snapshot files.
-    dir = "/snapshots"
+#    dir = "/snapshots"
 #    dir = "$$PATH_REPLACE$$"
+	dir = "c:\\temp\\jonsnapshots"
 
     # Number load attempts when recovering from the latest snapshot fails
     # yet older snapshot files are available. Each recovery attempt will try

@@ -24,6 +24,7 @@
   <ItemGroup>
     <Reference Include="vmstats-shared">
       <HintPath>..\vmstats-shared.dll</HintPath>
+      <Private>true</Private>
     </Reference>
   </ItemGroup>
 

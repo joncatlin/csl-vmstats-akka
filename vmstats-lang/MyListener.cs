@@ -9,7 +9,7 @@ namespace vmstats.lang
     public class MyListener : VmstatsBaseListener
     {
         #region Instance variables
-        private Queue<Messages.Transform> transforms = new Queue<Messages.Transform>();
+        private Queue<Messages.Transform> transforms;
         private Messages.Transform currentTransform;
         private Metric currentMetric;
         private string currentMetricName;
@@ -21,6 +21,7 @@ namespace vmstats.lang
         private Queue<Messages.BuildTransformSeries> series;
         private readonly ILoggingAdapter _log;
         private bool _errorFound = false;
+        private bool inCombine = false;
 
         #endregion
 
@@ -35,11 +36,19 @@ namespace vmstats.lang
         public override void EnterTransform_pipeline(VmstatsParser.Transform_pipelineContext context)
         {
             Console.WriteLine("EnterTransform_pipeline");
+
+            // Create a new series of transforms
+            transforms = new Queue<Messages.Transform>();
         }
 
         public override void ExitTransform_pipeline(VmstatsParser.Transform_pipelineContext context)
         {
             Console.WriteLine("ExitTransform_pipeline");
+
+            if (inCombine)
+            {
+                // Add the combine to the end of the list of transforms
+            }
 
             // Create a TransformSeries out of the information collected and add it to all the 
             // transform_pipelines found so far.
@@ -77,11 +86,21 @@ namespace vmstats.lang
         public override void EnterCombine(VmstatsParser.CombineContext context)
         {
             Console.WriteLine("EnterCombine");
+
+            // Create a new id for this combine, so all transforms created from now will contain this id
+            currentCombineID = Guid.NewGuid();
+            inCombine = true;
         }
 
         public override void ExitCombine(VmstatsParser.CombineContext context)
         {
             Console.WriteLine("ExitCombine");
+
+            // Create a transform out of the information collected and add it to the series
+            //var transform = new Messages.Transform(currentTransformName, currentParameters);
+            //transforms.Enqueue(transform);
+
+            inCombine = false;
         }
 
         public override void EnterMetric_name(VmstatsParser.Metric_nameContext context)

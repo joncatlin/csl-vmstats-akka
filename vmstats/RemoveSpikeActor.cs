@@ -104,7 +104,7 @@ namespace vmstats
             var metric = new Metric(msg.Measurements.Name + TRANSFORM_NAME_CONCATENATOR + TRANSFORM_NAME, newValues);
 
             // Route the new Metric to the next transform
-            var series = new Messages.TransformSeries(metric, msg.Transforms, msg.GroupID, msg.ConnectionId);
+            var series = new Messages.TransformSeries(metric, msg.Transforms, msg.GroupID, msg.ConnectionId, msg.VmName, msg.VmDate);
             RouteTransform(series);
         }
     }
