@@ -17,11 +17,12 @@ namespace vmstats.lang
         private string currentParameterName;
         private string currentValue;
         private Dictionary<string, string> currentParameters;
-        private Guid currentCombineID = Guid.NewGuid();
         private Queue<Messages.BuildTransformSeries> series;
         private readonly ILoggingAdapter _log;
         private bool _errorFound = false;
         private bool inCombine = false;
+        private int numberTransformPipelinesInCombine = 0;
+        private Queue<Guid> currentCombineID = new Queue<Guid>();
 
         #endregion
 
@@ -32,6 +33,18 @@ namespace vmstats.lang
             // Save the container for the BuildTransformSeries to be built by this listener class
             this.series = series;
         }
+
+        public override void EnterTransform_series(VmstatsParser.Transform_seriesContext context)
+        {
+            Console.WriteLine("EnterTransform_series");
+        }
+
+
+        public override void ExitTransform_series(VmstatsParser.Transform_seriesContext context)
+        {
+            Console.WriteLine("ExitTransform_series");
+        }
+
 
         public override void EnterTransform_pipeline(VmstatsParser.Transform_pipelineContext context)
         {
@@ -48,11 +61,15 @@ namespace vmstats.lang
             if (inCombine)
             {
                 // Add the combine to the end of the list of transforms
+                var parameters = new Dictionary<string, string>();
+                parameters.Add(CombineTransformActor.TRANSFORM_PARAM_COUNT_NAME, numberTransformPipelinesInCombine.ToString());
+                var transform = new Messages.Transform(CombineTransformActor.TRANSFORM_NAME, parameters);
+                transforms.Enqueue(transform);
             }
 
             // Create a TransformSeries out of the information collected and add it to all the 
             // transform_pipelines found so far.
-            series.Enqueue(new Messages.BuildTransformSeries(currentMetricName, transforms, currentCombineID));
+            series.Enqueue(new Messages.BuildTransformSeries(currentMetricName, transforms, currentCombineID.Peek()));
         }
 
         public override void EnterTransform(VmstatsParser.TransformContext context)
@@ -87,8 +104,13 @@ namespace vmstats.lang
         {
             Console.WriteLine("EnterCombine");
 
+            // Determine the number of transform pipelines in this combine. Remove 2 for the braces. 
+            // Divide by 2 and then round up, to account for the + between each transform
+            var count = context.ChildCount;
+            numberTransformPipelinesInCombine = ((count - 2) / 2) + 1;
+
             // Create a new id for this combine, so all transforms created from now will contain this id
-            currentCombineID = Guid.NewGuid();
+            currentCombineID.Enqueue(Guid.NewGuid());
             inCombine = true;
         }
 
@@ -96,10 +118,10 @@ namespace vmstats.lang
         {
             Console.WriteLine("ExitCombine");
 
-            // Create a transform out of the information collected and add it to the series
-            //var transform = new Messages.Transform(currentTransformName, currentParameters);
-            //transforms.Enqueue(transform);
-
+            // Remove this Combines id from the queue as it is not needed anymore and reset all the combine
+            // variables
+            currentCombineID.Dequeue();
+            numberTransformPipelinesInCombine = 0;
             inCombine = false;
         }
 

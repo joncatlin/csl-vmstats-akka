@@ -103,7 +103,7 @@ namespace vmstats
 
             // Create the CombineTransformActor actor pool
             Props comProps = Props.Create(() => new CombineTransformActor()).WithRouter(new ConsistentHashingPool(5));
-            IActorRef com = vmstatsActorSystem.ActorOf(pctProps, "Transforms-" + CombineTransformActor.TRANSFORM_NAME.ToUpper());
+            IActorRef com = vmstatsActorSystem.ActorOf(comProps, "Transforms-" + CombineTransformActor.TRANSFORM_NAME.ToUpper());
 
             // Create the metric dispatcher
             Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor(snapshotPath, guiWebserUrl));

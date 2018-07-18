@@ -73,7 +73,7 @@ namespace vmstats.lang
                 parser.RemoveErrorListeners();
 
                 // Specify the entry point to the stream of tokens
-                VmstatsParser.Transform_pipelineContext context = parser.transform_pipeline();
+                VmstatsParser.Transform_seriesContext context = parser.transform_series();
 
                 // Create an instance of our listener class to be called as we walk the language
                 MyListener myListener = new MyListener(_log, series);
@@ -93,7 +93,7 @@ namespace vmstats.lang
                 // Now walk the AST having the listener be called during all the events
                 walker.Walk(myListener, context);
 
-            _log.Debug("Walked the tree to decode the DSL. Result: " + JsonConvert.SerializeObject(series));
+                _log.Debug("Walked the tree to decode the DSL. Result: " + JsonConvert.SerializeObject(series));
 /*
             }
             catch (RecognitionException ex)

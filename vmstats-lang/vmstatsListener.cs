@@ -31,6 +31,16 @@ using IToken = Antlr4.Runtime.IToken;
 [System.CLSCompliant(false)]
 public interface IVmstatsListener : IParseTreeListener {
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="VmstatsParser.transform_series"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterTransform_series([NotNull] VmstatsParser.Transform_seriesContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="VmstatsParser.transform_series"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitTransform_series([NotNull] VmstatsParser.Transform_seriesContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="VmstatsParser.transform_pipeline"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

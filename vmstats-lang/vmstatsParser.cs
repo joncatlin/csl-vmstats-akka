@@ -39,12 +39,12 @@ public partial class VmstatsParser : Parser {
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
 		ID=10, WHITESPACE=11;
 	public const int
-		RULE_transform_pipeline = 0, RULE_transform = 1, RULE_parameter = 2, RULE_combine = 3, 
-		RULE_metric_name = 4, RULE_transform_name = 5, RULE_parameter_name = 6, 
-		RULE_value_name = 7;
+		RULE_transform_series = 0, RULE_transform_pipeline = 1, RULE_transform = 2, 
+		RULE_parameter = 3, RULE_combine = 4, RULE_metric_name = 5, RULE_transform_name = 6, 
+		RULE_parameter_name = 7, RULE_value_name = 8;
 	public static readonly string[] ruleNames = {
-		"transform_pipeline", "transform", "parameter", "combine", "metric_name", 
-		"transform_name", "parameter_name", "value_name"
+		"transform_series", "transform_pipeline", "transform", "parameter", "combine", 
+		"metric_name", "transform_name", "parameter_name", "value_name"
 	};
 
 	private static readonly string[] _LiteralNames = {
@@ -84,6 +84,69 @@ public partial class VmstatsParser : Parser {
 	{
 		Interpreter = new ParserATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 	}
+	public partial class Transform_seriesContext : ParserRuleContext {
+		public CombineContext combine() {
+			return GetRuleContext<CombineContext>(0);
+		}
+		public Transform_pipelineContext transform_pipeline() {
+			return GetRuleContext<Transform_pipelineContext>(0);
+		}
+		public Transform_seriesContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_transform_series; } }
+		public override void EnterRule(IParseTreeListener listener) {
+			IVmstatsListener typedListener = listener as IVmstatsListener;
+			if (typedListener != null) typedListener.EnterTransform_series(this);
+		}
+		public override void ExitRule(IParseTreeListener listener) {
+			IVmstatsListener typedListener = listener as IVmstatsListener;
+			if (typedListener != null) typedListener.ExitTransform_series(this);
+		}
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			IVmstatsVisitor<TResult> typedVisitor = visitor as IVmstatsVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitTransform_series(this);
+			else return visitor.VisitChildren(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public Transform_seriesContext transform_series() {
+		Transform_seriesContext _localctx = new Transform_seriesContext(Context, State);
+		EnterRule(_localctx, 0, RULE_transform_series);
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 20;
+			ErrorHandler.Sync(this);
+			switch (TokenStream.LA(1)) {
+			case T__6:
+				{
+				State = 18; combine();
+				}
+				break;
+			case ID:
+				{
+				State = 19; transform_pipeline();
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
 	public partial class Transform_pipelineContext : ParserRuleContext {
 		public Metric_nameContext metric_name() {
 			return GetRuleContext<Metric_nameContext>(0);
@@ -93,10 +156,6 @@ public partial class VmstatsParser : Parser {
 		}
 		public TransformContext transform(int i) {
 			return GetRuleContext<TransformContext>(i);
-		}
-		public ITerminalNode Eof() { return GetToken(VmstatsParser.Eof, 0); }
-		public CombineContext combine() {
-			return GetRuleContext<CombineContext>(0);
 		}
 		public Transform_pipelineContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -121,44 +180,28 @@ public partial class VmstatsParser : Parser {
 	[RuleVersion(0)]
 	public Transform_pipelineContext transform_pipeline() {
 		Transform_pipelineContext _localctx = new Transform_pipelineContext(Context, State);
-		EnterRule(_localctx, 0, RULE_transform_pipeline);
+		EnterRule(_localctx, 2, RULE_transform_pipeline);
 		int _la;
 		try {
-			State = 31;
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 22; metric_name();
+			State = 23; Match(T__0);
+			State = 24; transform();
+			State = 29;
 			ErrorHandler.Sync(this);
-			switch (TokenStream.LA(1)) {
-			case ID:
-				EnterOuterAlt(_localctx, 1);
+			_la = TokenStream.LA(1);
+			while (_la==T__1) {
 				{
-				State = 16; metric_name();
-				State = 17; Match(T__0);
-				State = 18; transform();
-				State = 23;
+				{
+				State = 25; Match(T__1);
+				State = 26; transform();
+				}
+				}
+				State = 31;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
-				while (_la==T__1) {
-					{
-					{
-					State = 19; Match(T__1);
-					State = 20; transform();
-					}
-					}
-					State = 25;
-					ErrorHandler.Sync(this);
-					_la = TokenStream.LA(1);
-				}
-				State = 26; Match(Eof);
-				}
-				break;
-			case T__6:
-				EnterOuterAlt(_localctx, 2);
-				{
-				State = 28; combine();
-				State = 29; Match(Eof);
-				}
-				break;
-			default:
-				throw new NoViableAltException(this);
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -205,30 +248,30 @@ public partial class VmstatsParser : Parser {
 	[RuleVersion(0)]
 	public TransformContext transform() {
 		TransformContext _localctx = new TransformContext(Context, State);
-		EnterRule(_localctx, 2, RULE_transform);
+		EnterRule(_localctx, 4, RULE_transform);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 33; transform_name();
-			State = 42;
+			State = 32; transform_name();
+			State = 41;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			if (_la==T__2) {
 				{
-				State = 34; Match(T__2);
-				State = 35; parameter();
-				State = 38;
+				State = 33; Match(T__2);
+				State = 34; parameter();
+				State = 37;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 				if (_la==T__3) {
 					{
-					State = 36; Match(T__3);
-					State = 37; parameter();
+					State = 35; Match(T__3);
+					State = 36; parameter();
 					}
 				}
 
-				State = 40; Match(T__4);
+				State = 39; Match(T__4);
 				}
 			}
 
@@ -275,13 +318,13 @@ public partial class VmstatsParser : Parser {
 	[RuleVersion(0)]
 	public ParameterContext parameter() {
 		ParameterContext _localctx = new ParameterContext(Context, State);
-		EnterRule(_localctx, 4, RULE_parameter);
+		EnterRule(_localctx, 6, RULE_parameter);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 44; parameter_name();
-			State = 45; Match(T__5);
-			State = 46; value_name();
+			State = 43; parameter_name();
+			State = 44; Match(T__5);
+			State = 45; value_name();
 			}
 		}
 		catch (RecognitionException re) {
@@ -296,11 +339,11 @@ public partial class VmstatsParser : Parser {
 	}
 
 	public partial class CombineContext : ParserRuleContext {
-		public Transform_pipelineContext[] transform_pipeline() {
-			return GetRuleContexts<Transform_pipelineContext>();
+		public Transform_seriesContext[] transform_series() {
+			return GetRuleContexts<Transform_seriesContext>();
 		}
-		public Transform_pipelineContext transform_pipeline(int i) {
-			return GetRuleContext<Transform_pipelineContext>(i);
+		public Transform_seriesContext transform_series(int i) {
+			return GetRuleContext<Transform_seriesContext>(i);
 		}
 		public CombineContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -325,30 +368,30 @@ public partial class VmstatsParser : Parser {
 	[RuleVersion(0)]
 	public CombineContext combine() {
 		CombineContext _localctx = new CombineContext(Context, State);
-		EnterRule(_localctx, 6, RULE_combine);
+		EnterRule(_localctx, 8, RULE_combine);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 48; Match(T__6);
-			State = 49; transform_pipeline();
-			State = 50; Match(T__7);
-			State = 51; transform_pipeline();
-			State = 56;
+			State = 47; Match(T__6);
+			State = 48; transform_series();
+			State = 49; Match(T__7);
+			State = 50; transform_series();
+			State = 55;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==T__7) {
 				{
 				{
-				State = 52; Match(T__7);
-				State = 53; transform_pipeline();
+				State = 51; Match(T__7);
+				State = 52; transform_series();
 				}
 				}
-				State = 58;
+				State = 57;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 59; Match(T__8);
+			State = 58; Match(T__8);
 			}
 		}
 		catch (RecognitionException re) {
@@ -387,11 +430,11 @@ public partial class VmstatsParser : Parser {
 	[RuleVersion(0)]
 	public Metric_nameContext metric_name() {
 		Metric_nameContext _localctx = new Metric_nameContext(Context, State);
-		EnterRule(_localctx, 8, RULE_metric_name);
+		EnterRule(_localctx, 10, RULE_metric_name);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 61; Match(ID);
+			State = 60; Match(ID);
 			}
 		}
 		catch (RecognitionException re) {
@@ -430,11 +473,11 @@ public partial class VmstatsParser : Parser {
 	[RuleVersion(0)]
 	public Transform_nameContext transform_name() {
 		Transform_nameContext _localctx = new Transform_nameContext(Context, State);
-		EnterRule(_localctx, 10, RULE_transform_name);
+		EnterRule(_localctx, 12, RULE_transform_name);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 63; Match(ID);
+			State = 62; Match(ID);
 			}
 		}
 		catch (RecognitionException re) {
@@ -473,11 +516,11 @@ public partial class VmstatsParser : Parser {
 	[RuleVersion(0)]
 	public Parameter_nameContext parameter_name() {
 		Parameter_nameContext _localctx = new Parameter_nameContext(Context, State);
-		EnterRule(_localctx, 12, RULE_parameter_name);
+		EnterRule(_localctx, 14, RULE_parameter_name);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 65; Match(ID);
+			State = 64; Match(ID);
 			}
 		}
 		catch (RecognitionException re) {
@@ -516,11 +559,11 @@ public partial class VmstatsParser : Parser {
 	[RuleVersion(0)]
 	public Value_nameContext value_name() {
 		Value_nameContext _localctx = new Value_nameContext(Context, State);
-		EnterRule(_localctx, 14, RULE_value_name);
+		EnterRule(_localctx, 16, RULE_value_name);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 67; Match(ID);
+			State = 66; Match(ID);
 			}
 		}
 		catch (RecognitionException re) {
@@ -536,59 +579,58 @@ public partial class VmstatsParser : Parser {
 
 	private static char[] _serializedATN = {
 		'\x3', '\x608B', '\xA72A', '\x8133', '\xB9ED', '\x417C', '\x3BE7', '\x7786', 
-		'\x5964', '\x3', '\r', 'H', '\x4', '\x2', '\t', '\x2', '\x4', '\x3', '\t', 
+		'\x5964', '\x3', '\r', 'G', '\x4', '\x2', '\t', '\x2', '\x4', '\x3', '\t', 
 		'\x3', '\x4', '\x4', '\t', '\x4', '\x4', '\x5', '\t', '\x5', '\x4', '\x6', 
 		'\t', '\x6', '\x4', '\a', '\t', '\a', '\x4', '\b', '\t', '\b', '\x4', 
-		'\t', '\t', '\t', '\x3', '\x2', '\x3', '\x2', '\x3', '\x2', '\x3', '\x2', 
-		'\x3', '\x2', '\a', '\x2', '\x18', '\n', '\x2', '\f', '\x2', '\xE', '\x2', 
-		'\x1B', '\v', '\x2', '\x3', '\x2', '\x3', '\x2', '\x3', '\x2', '\x3', 
-		'\x2', '\x3', '\x2', '\x5', '\x2', '\"', '\n', '\x2', '\x3', '\x3', '\x3', 
-		'\x3', '\x3', '\x3', '\x3', '\x3', '\x3', '\x3', '\x5', '\x3', ')', '\n', 
-		'\x3', '\x3', '\x3', '\x3', '\x3', '\x5', '\x3', '-', '\n', '\x3', '\x3', 
-		'\x4', '\x3', '\x4', '\x3', '\x4', '\x3', '\x4', '\x3', '\x5', '\x3', 
-		'\x5', '\x3', '\x5', '\x3', '\x5', '\x3', '\x5', '\x3', '\x5', '\a', '\x5', 
-		'\x39', '\n', '\x5', '\f', '\x5', '\xE', '\x5', '<', '\v', '\x5', '\x3', 
-		'\x5', '\x3', '\x5', '\x3', '\x6', '\x3', '\x6', '\x3', '\a', '\x3', '\a', 
-		'\x3', '\b', '\x3', '\b', '\x3', '\t', '\x3', '\t', '\x3', '\t', '\x2', 
-		'\x2', '\n', '\x2', '\x4', '\x6', '\b', '\n', '\f', '\xE', '\x10', '\x2', 
-		'\x2', '\x2', '\x44', '\x2', '!', '\x3', '\x2', '\x2', '\x2', '\x4', '#', 
-		'\x3', '\x2', '\x2', '\x2', '\x6', '.', '\x3', '\x2', '\x2', '\x2', '\b', 
-		'\x32', '\x3', '\x2', '\x2', '\x2', '\n', '?', '\x3', '\x2', '\x2', '\x2', 
-		'\f', '\x41', '\x3', '\x2', '\x2', '\x2', '\xE', '\x43', '\x3', '\x2', 
-		'\x2', '\x2', '\x10', '\x45', '\x3', '\x2', '\x2', '\x2', '\x12', '\x13', 
-		'\x5', '\n', '\x6', '\x2', '\x13', '\x14', '\a', '\x3', '\x2', '\x2', 
-		'\x14', '\x19', '\x5', '\x4', '\x3', '\x2', '\x15', '\x16', '\a', '\x4', 
-		'\x2', '\x2', '\x16', '\x18', '\x5', '\x4', '\x3', '\x2', '\x17', '\x15', 
-		'\x3', '\x2', '\x2', '\x2', '\x18', '\x1B', '\x3', '\x2', '\x2', '\x2', 
-		'\x19', '\x17', '\x3', '\x2', '\x2', '\x2', '\x19', '\x1A', '\x3', '\x2', 
-		'\x2', '\x2', '\x1A', '\x1C', '\x3', '\x2', '\x2', '\x2', '\x1B', '\x19', 
-		'\x3', '\x2', '\x2', '\x2', '\x1C', '\x1D', '\a', '\x2', '\x2', '\x3', 
-		'\x1D', '\"', '\x3', '\x2', '\x2', '\x2', '\x1E', '\x1F', '\x5', '\b', 
-		'\x5', '\x2', '\x1F', ' ', '\a', '\x2', '\x2', '\x3', ' ', '\"', '\x3', 
-		'\x2', '\x2', '\x2', '!', '\x12', '\x3', '\x2', '\x2', '\x2', '!', '\x1E', 
-		'\x3', '\x2', '\x2', '\x2', '\"', '\x3', '\x3', '\x2', '\x2', '\x2', '#', 
-		',', '\x5', '\f', '\a', '\x2', '$', '%', '\a', '\x5', '\x2', '\x2', '%', 
-		'(', '\x5', '\x6', '\x4', '\x2', '&', '\'', '\a', '\x6', '\x2', '\x2', 
-		'\'', ')', '\x5', '\x6', '\x4', '\x2', '(', '&', '\x3', '\x2', '\x2', 
-		'\x2', '(', ')', '\x3', '\x2', '\x2', '\x2', ')', '*', '\x3', '\x2', '\x2', 
-		'\x2', '*', '+', '\a', '\a', '\x2', '\x2', '+', '-', '\x3', '\x2', '\x2', 
-		'\x2', ',', '$', '\x3', '\x2', '\x2', '\x2', ',', '-', '\x3', '\x2', '\x2', 
-		'\x2', '-', '\x5', '\x3', '\x2', '\x2', '\x2', '.', '/', '\x5', '\xE', 
-		'\b', '\x2', '/', '\x30', '\a', '\b', '\x2', '\x2', '\x30', '\x31', '\x5', 
-		'\x10', '\t', '\x2', '\x31', '\a', '\x3', '\x2', '\x2', '\x2', '\x32', 
-		'\x33', '\a', '\t', '\x2', '\x2', '\x33', '\x34', '\x5', '\x2', '\x2', 
-		'\x2', '\x34', '\x35', '\a', '\n', '\x2', '\x2', '\x35', ':', '\x5', '\x2', 
-		'\x2', '\x2', '\x36', '\x37', '\a', '\n', '\x2', '\x2', '\x37', '\x39', 
-		'\x5', '\x2', '\x2', '\x2', '\x38', '\x36', '\x3', '\x2', '\x2', '\x2', 
-		'\x39', '<', '\x3', '\x2', '\x2', '\x2', ':', '\x38', '\x3', '\x2', '\x2', 
-		'\x2', ':', ';', '\x3', '\x2', '\x2', '\x2', ';', '=', '\x3', '\x2', '\x2', 
-		'\x2', '<', ':', '\x3', '\x2', '\x2', '\x2', '=', '>', '\a', '\v', '\x2', 
-		'\x2', '>', '\t', '\x3', '\x2', '\x2', '\x2', '?', '@', '\a', '\f', '\x2', 
-		'\x2', '@', '\v', '\x3', '\x2', '\x2', '\x2', '\x41', '\x42', '\a', '\f', 
-		'\x2', '\x2', '\x42', '\r', '\x3', '\x2', '\x2', '\x2', '\x43', '\x44', 
-		'\a', '\f', '\x2', '\x2', '\x44', '\xF', '\x3', '\x2', '\x2', '\x2', '\x45', 
-		'\x46', '\a', '\f', '\x2', '\x2', '\x46', '\x11', '\x3', '\x2', '\x2', 
-		'\x2', '\a', '\x19', '!', '(', ',', ':',
+		'\t', '\t', '\t', '\x4', '\n', '\t', '\n', '\x3', '\x2', '\x3', '\x2', 
+		'\x5', '\x2', '\x17', '\n', '\x2', '\x3', '\x3', '\x3', '\x3', '\x3', 
+		'\x3', '\x3', '\x3', '\x3', '\x3', '\a', '\x3', '\x1E', '\n', '\x3', '\f', 
+		'\x3', '\xE', '\x3', '!', '\v', '\x3', '\x3', '\x4', '\x3', '\x4', '\x3', 
+		'\x4', '\x3', '\x4', '\x3', '\x4', '\x5', '\x4', '(', '\n', '\x4', '\x3', 
+		'\x4', '\x3', '\x4', '\x5', '\x4', ',', '\n', '\x4', '\x3', '\x5', '\x3', 
+		'\x5', '\x3', '\x5', '\x3', '\x5', '\x3', '\x6', '\x3', '\x6', '\x3', 
+		'\x6', '\x3', '\x6', '\x3', '\x6', '\x3', '\x6', '\a', '\x6', '\x38', 
+		'\n', '\x6', '\f', '\x6', '\xE', '\x6', ';', '\v', '\x6', '\x3', '\x6', 
+		'\x3', '\x6', '\x3', '\a', '\x3', '\a', '\x3', '\b', '\x3', '\b', '\x3', 
+		'\t', '\x3', '\t', '\x3', '\n', '\x3', '\n', '\x3', '\n', '\x2', '\x2', 
+		'\v', '\x2', '\x4', '\x6', '\b', '\n', '\f', '\xE', '\x10', '\x12', '\x2', 
+		'\x2', '\x2', '\x42', '\x2', '\x16', '\x3', '\x2', '\x2', '\x2', '\x4', 
+		'\x18', '\x3', '\x2', '\x2', '\x2', '\x6', '\"', '\x3', '\x2', '\x2', 
+		'\x2', '\b', '-', '\x3', '\x2', '\x2', '\x2', '\n', '\x31', '\x3', '\x2', 
+		'\x2', '\x2', '\f', '>', '\x3', '\x2', '\x2', '\x2', '\xE', '@', '\x3', 
+		'\x2', '\x2', '\x2', '\x10', '\x42', '\x3', '\x2', '\x2', '\x2', '\x12', 
+		'\x44', '\x3', '\x2', '\x2', '\x2', '\x14', '\x17', '\x5', '\n', '\x6', 
+		'\x2', '\x15', '\x17', '\x5', '\x4', '\x3', '\x2', '\x16', '\x14', '\x3', 
+		'\x2', '\x2', '\x2', '\x16', '\x15', '\x3', '\x2', '\x2', '\x2', '\x17', 
+		'\x3', '\x3', '\x2', '\x2', '\x2', '\x18', '\x19', '\x5', '\f', '\a', 
+		'\x2', '\x19', '\x1A', '\a', '\x3', '\x2', '\x2', '\x1A', '\x1F', '\x5', 
+		'\x6', '\x4', '\x2', '\x1B', '\x1C', '\a', '\x4', '\x2', '\x2', '\x1C', 
+		'\x1E', '\x5', '\x6', '\x4', '\x2', '\x1D', '\x1B', '\x3', '\x2', '\x2', 
+		'\x2', '\x1E', '!', '\x3', '\x2', '\x2', '\x2', '\x1F', '\x1D', '\x3', 
+		'\x2', '\x2', '\x2', '\x1F', ' ', '\x3', '\x2', '\x2', '\x2', ' ', '\x5', 
+		'\x3', '\x2', '\x2', '\x2', '!', '\x1F', '\x3', '\x2', '\x2', '\x2', '\"', 
+		'+', '\x5', '\xE', '\b', '\x2', '#', '$', '\a', '\x5', '\x2', '\x2', '$', 
+		'\'', '\x5', '\b', '\x5', '\x2', '%', '&', '\a', '\x6', '\x2', '\x2', 
+		'&', '(', '\x5', '\b', '\x5', '\x2', '\'', '%', '\x3', '\x2', '\x2', '\x2', 
+		'\'', '(', '\x3', '\x2', '\x2', '\x2', '(', ')', '\x3', '\x2', '\x2', 
+		'\x2', ')', '*', '\a', '\a', '\x2', '\x2', '*', ',', '\x3', '\x2', '\x2', 
+		'\x2', '+', '#', '\x3', '\x2', '\x2', '\x2', '+', ',', '\x3', '\x2', '\x2', 
+		'\x2', ',', '\a', '\x3', '\x2', '\x2', '\x2', '-', '.', '\x5', '\x10', 
+		'\t', '\x2', '.', '/', '\a', '\b', '\x2', '\x2', '/', '\x30', '\x5', '\x12', 
+		'\n', '\x2', '\x30', '\t', '\x3', '\x2', '\x2', '\x2', '\x31', '\x32', 
+		'\a', '\t', '\x2', '\x2', '\x32', '\x33', '\x5', '\x2', '\x2', '\x2', 
+		'\x33', '\x34', '\a', '\n', '\x2', '\x2', '\x34', '\x39', '\x5', '\x2', 
+		'\x2', '\x2', '\x35', '\x36', '\a', '\n', '\x2', '\x2', '\x36', '\x38', 
+		'\x5', '\x2', '\x2', '\x2', '\x37', '\x35', '\x3', '\x2', '\x2', '\x2', 
+		'\x38', ';', '\x3', '\x2', '\x2', '\x2', '\x39', '\x37', '\x3', '\x2', 
+		'\x2', '\x2', '\x39', ':', '\x3', '\x2', '\x2', '\x2', ':', '<', '\x3', 
+		'\x2', '\x2', '\x2', ';', '\x39', '\x3', '\x2', '\x2', '\x2', '<', '=', 
+		'\a', '\v', '\x2', '\x2', '=', '\v', '\x3', '\x2', '\x2', '\x2', '>', 
+		'?', '\a', '\f', '\x2', '\x2', '?', '\r', '\x3', '\x2', '\x2', '\x2', 
+		'@', '\x41', '\a', '\f', '\x2', '\x2', '\x41', '\xF', '\x3', '\x2', '\x2', 
+		'\x2', '\x42', '\x43', '\a', '\f', '\x2', '\x2', '\x43', '\x11', '\x3', 
+		'\x2', '\x2', '\x2', '\x44', '\x45', '\a', '\f', '\x2', '\x2', '\x45', 
+		'\x13', '\x3', '\x2', '\x2', '\x2', '\a', '\x16', '\x1F', '\'', '+', '\x39',
 	};
 
 	public static readonly ATN _ATN =

@@ -15,7 +15,7 @@ namespace vmstats
         
         // Parameters for the transform
         // TODO plumb the DSL parser to create a parameter using the following name that contains the number of transforms in the combine
-        public static readonly string COUNT = "C";
+        public static readonly string TRANSFORM_PARAM_COUNT_NAME = "C";
 
         // The store to hold the transforms in pending receiving all of them to be be combined
         Dictionary<Guid, List<Messages.TransformSeries>> TransformSereiesHoldingStore = new Dictionary<Guid, List<Messages.TransformSeries>>();
@@ -36,7 +36,7 @@ namespace vmstats
                 _log.Debug($"Already have some transforms for GroupID: {msg.GroupID}");
 
                 // There are some transforms with the same id. Check to see if all of them have been received.
-                var numExpected = Convert.ToInt32(msg.Transforms.Dequeue().Parameters[COUNT]);
+                var numExpected = Convert.ToInt32(msg.Transforms.Dequeue().Parameters[TRANSFORM_PARAM_COUNT_NAME]);
                 var storedTransforms = TransformSereiesHoldingStore[msg.GroupID];
 
                 if (storedTransforms.Count == numExpected - 1)
@@ -66,6 +66,7 @@ namespace vmstats
                 // There are no entries for this TransformSeries, this is the first one
                 var list = new List<Messages.TransformSeries>();
                 list.Add(msg);
+                TransformSereiesHoldingStore.Add(msg.GroupID, list);
             }
 
         }

@@ -15,6 +15,18 @@ public class VmstatsBaseListener implements VmstatsListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterTransform_series(VmstatsParser.Transform_seriesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTransform_series(VmstatsParser.Transform_seriesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterTransform_pipeline(VmstatsParser.Transform_pipelineContext ctx) { }
 	/**
 	 * {@inheritDoc}

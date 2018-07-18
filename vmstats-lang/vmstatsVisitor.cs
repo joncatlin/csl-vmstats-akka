@@ -32,6 +32,12 @@ using IToken = Antlr4.Runtime.IToken;
 [System.CLSCompliant(false)]
 public interface IVmstatsVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="VmstatsParser.transform_series"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitTransform_series([NotNull] VmstatsParser.Transform_seriesContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="VmstatsParser.transform_pipeline"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

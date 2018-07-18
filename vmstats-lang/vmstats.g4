@@ -3,10 +3,14 @@ grammar Vmstats;
 /*
  * Parser rules
  */
-transform_pipeline	: metric_name '->' transform (':' transform)* EOF | combine EOF;
+/*
+all					: transform_series EOF ;
+*/
+transform_series	: (combine | transform_pipeline) ;
+transform_pipeline	: metric_name '->' transform (':' transform)* ;
 transform			: transform_name ('{' parameter (',' parameter)? '}')? ; 
 parameter			: parameter_name '=' value_name ;
-combine				: '(' transform_pipeline '+' transform_pipeline ('+' transform_pipeline)* ')' ;
+combine				: '(' transform_series '+' transform_series ('+' transform_series)* ')' ;
 metric_name			: ID ;
 transform_name		: ID ;
 parameter_name		: ID ;

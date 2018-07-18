@@ -7,6 +7,16 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface VmstatsListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link VmstatsParser#transform_series}.
+	 * @param ctx the parse tree
+	 */
+	void enterTransform_series(VmstatsParser.Transform_seriesContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link VmstatsParser#transform_series}.
+	 * @param ctx the parse tree
+	 */
+	void exitTransform_series(VmstatsParser.Transform_seriesContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link VmstatsParser#transform_pipeline}.
 	 * @param ctx the parse tree
 	 */
