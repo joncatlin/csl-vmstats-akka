@@ -29,28 +29,23 @@ namespace vmstats
             // Find the max and min values in the data
             float max = float.MinValue;
             float min = float.MaxValue;
-            for (int index = 0; index < msg.Measurements.Values.Count; index++)
+
+            foreach (var entry in msg.Measurements.Values)
             {
-                if (msg.Measurements.Values[index] > max)
-                {
-                    max = msg.Measurements.Values[index];
-                }
-                else if (msg.Measurements.Values[index] < min)
-                {
-                    min = msg.Measurements.Values[index];
-                }
+                if (entry.Value > max) max = entry.Value;
+                if (entry.Value < min) min = entry.Value;
             }
 
             // Take the min value from the max as the min value is going to become zero after the
             // transform
             max -= min;
 
-            // TODO Make sure that the max is not zero to prevent divide by zero
-            SortedDictionary<long, float> newValues = new SortedDictionary<long, float>();
+            // Make sure that the max is not zero to prevent divide by zero
+            var newValues = new SortedDictionary<long, float>();
             if (max != 0.0F)
             {
                 // Tansform the Metric data into percentages, where max is 100% and min is 0%
-                foreach (KeyValuePair<long, float> entry in msg.Measurements.Values)
+                foreach (var entry in msg.Measurements.Values)
                 {
                     if (entry.Value != 0.0F)
                     {

@@ -69,7 +69,8 @@ namespace vmstats.lang
 
             // Create a TransformSeries out of the information collected and add it to all the 
             // transform_pipelines found so far.
-            series.Enqueue(new Messages.BuildTransformSeries(currentMetricName, transforms, currentCombineID.Peek()));
+            var guid = (currentCombineID.Count > 0) ? currentCombineID.Peek() : Guid.NewGuid();
+            series.Enqueue(new Messages.BuildTransformSeries(currentMetricName, transforms, guid));
         }
 
         public override void EnterTransform(VmstatsParser.TransformContext context)

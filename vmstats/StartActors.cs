@@ -105,6 +105,10 @@ namespace vmstats
             Props comProps = Props.Create(() => new CombineTransformActor()).WithRouter(new ConsistentHashingPool(5));
             IActorRef com = vmstatsActorSystem.ActorOf(comProps, "Transforms-" + CombineTransformActor.TRANSFORM_NAME.ToUpper());
 
+            // Create the RemovePercentileActor actor pool
+            Props rptProps = Props.Create(() => new RemovePercentileActor()).WithRouter(new RoundRobinPool(5));
+            IActorRef rpt = vmstatsActorSystem.ActorOf(rptProps, "Transforms-" + RemovePercentileActor.TRANSFORM_NAME.ToUpper());
+
             // Create the metric dispatcher
             Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor(snapshotPath, guiWebserUrl));
             IActorRef metricAccumulatorDispatcherActor = vmstatsActorSystem.ActorOf(metricAccumulatorDispatcherProps,
