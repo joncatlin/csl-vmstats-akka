@@ -18,7 +18,7 @@ namespace vmstats
         public static readonly string TRANSFORM_PARAM_COUNT_NAME = "C";
 
         // The store to hold the transforms in pending receiving all of them to be be combined
-        Dictionary<Guid, List<Messages.TransformSeries>> TransformSereiesHoldingStore = new Dictionary<Guid, List<Messages.TransformSeries>>();
+        Dictionary<string, List<Messages.TransformSeries>> TransformSereiesHoldingStore = new Dictionary<string, List<Messages.TransformSeries>>();
 
         public CombineTransformActor()
         {
@@ -28,20 +28,24 @@ namespace vmstats
 
         private void ProcessRequest(Messages.TransformSeries msg)
         {
-            _log.Debug($"Received transform series for combining. GroupID: {msg.GroupID}");
+            // Create a key from the vmName, groupId and the date as multiple combines will have the same group id and only
+            // the groupId + vmDate + vmName are unique.
+            string key = msg.VmName + "-" + msg.VmDate + "-" + msg.GroupID.ToString();
 
-            // Check to see if there are any transforms already received and stored which have the same ID
-            if (TransformSereiesHoldingStore.ContainsKey(msg.GroupID))
+            _log.Debug($"Received transform series for combining. Key: {key}");
+
+            // Check to see if there are any transforms already received and stored which have the same key
+            if (TransformSereiesHoldingStore.ContainsKey(key))
             {
-                _log.Debug($"Already have some transforms for GroupID: {msg.GroupID}");
+                _log.Debug($"Already have some transforms for key: {key}");
 
                 // There are some transforms with the same id. Check to see if all of them have been received.
                 var numExpected = Convert.ToInt32(msg.Transforms.Dequeue().Parameters[TRANSFORM_PARAM_COUNT_NAME]);
-                var storedTransforms = TransformSereiesHoldingStore[msg.GroupID];
+                var storedTransforms = TransformSereiesHoldingStore[key];
 
                 if (storedTransforms.Count == numExpected - 1)
                 {
-                    _log.Debug($"All transforms now received for GroupID: {msg.GroupID}. Combining the metrics from each and then routing.");
+                    _log.Debug($"All transforms now received for Key: {key}. Combining the metrics from each and then routing.");
 
                     // Enough transforms have been received so combine them
                     storedTransforms.Add(msg);
@@ -53,7 +57,7 @@ namespace vmstats
                 }
                 else
                 {
-                    _log.Debug($"Still waiting for some transforms to be received, storing received transforms with others. GroupID: {msg.GroupID}");
+                    _log.Debug($"Still waiting for some transforms to be received, storing received transforms with others. Key: {key}");
  
                     // Still waiting for some of the metrics in the combine to be received so store this one
                     storedTransforms.Add(msg);
@@ -61,12 +65,12 @@ namespace vmstats
             }
             else
             {
-                _log.Debug($"This is the first transform with GroupID: {msg.GroupID}. Storing it and awaiting the rest.");
+                _log.Debug($"This is the first transform with Key: {key}. Storing it and awaiting the rest.");
 
                 // There are no entries for this TransformSeries, this is the first one
                 var list = new List<Messages.TransformSeries>();
                 list.Add(msg);
-                TransformSereiesHoldingStore.Add(msg.GroupID, list);
+                TransformSereiesHoldingStore.Add(key, list);
             }
 
         }

@@ -109,6 +109,14 @@ namespace vmstats
             Props rptProps = Props.Create(() => new RemovePercentileActor()).WithRouter(new RoundRobinPool(5));
             IActorRef rpt = vmstatsActorSystem.ActorOf(rptProps, "Transforms-" + RemovePercentileActor.TRANSFORM_NAME.ToUpper());
 
+            // Create the RemovePercentileActor actor pool
+            Props fldProps = Props.Create(() => new FlattenDeviationActor()).WithRouter(new RoundRobinPool(5));
+            IActorRef fld = vmstatsActorSystem.ActorOf(fldProps, "Transforms-" + FlattenDeviationActor.TRANSFORM_NAME.ToUpper());
+
+            // Create the RemoveLowValuesActor actor pool
+            Props rlvProps = Props.Create(() => new RemoveLowValuesActor()).WithRouter(new RoundRobinPool(5));
+            IActorRef rlv = vmstatsActorSystem.ActorOf(rlvProps, "Transforms-" + RemoveLowValuesActor.TRANSFORM_NAME.ToUpper());
+
             // Create the metric dispatcher
             Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor(snapshotPath, guiWebserUrl));
             IActorRef metricAccumulatorDispatcherActor = vmstatsActorSystem.ActorOf(metricAccumulatorDispatcherProps,
