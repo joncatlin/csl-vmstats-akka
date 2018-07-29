@@ -6,7 +6,7 @@ grammar Vmstats;
 /*
 all					: transform_series EOF ;
 */
-transform_series	: (combine | transform_pipeline) ;
+transform_series	: (combine (':' transform)* | transform_pipeline) ;
 transform_pipeline	: metric_name '->' transform (':' transform)* ;
 transform			: transform_name ('{' parameter (',' parameter)? '}')? ; 
 parameter			: parameter_name '=' value_name ;

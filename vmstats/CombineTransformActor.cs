@@ -51,8 +51,18 @@ namespace vmstats
                     storedTransforms.Add(msg);
                     var metric = Combine(storedTransforms);
 
+                    // Find the stored message with the same key that has the largest number of transforms and use it to 
+                    // route the result. This is because only one of the messages will have any further transforms on it 
+                    // from the DSL.
+                    var msgToUseForRouting = msg;
+                    foreach (var storedMsg in storedTransforms)
+                    {
+                        if (storedMsg.Transforms.Count > msgToUseForRouting.Transforms.Count) msgToUseForRouting = storedMsg;
+                    }
+
                     // Route the result of the combine transform
-                    var series = new Messages.TransformSeries(metric, msg.Transforms, msg.GroupID, msg.ConnectionId, msg.VmName, msg.VmDate);
+                    var series = new Messages.TransformSeries(metric, msgToUseForRouting.Transforms, msgToUseForRouting.GroupID,
+                        msgToUseForRouting.ConnectionId, msgToUseForRouting.VmName, msgToUseForRouting.VmDate);
                     RouteTransform(series);
                 }
                 else
