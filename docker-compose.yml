@@ -2,7 +2,7 @@ version: '3'
 
 services:
   vmstats:
-    image: joncatlin/vmstats
+    image: joncatlin/csl-vmstats-akka
     volumes:
       - "/mount/vmstats-data/Desktops/:/data"
       - "/mount/general-data/vmstats-config/:/config"
