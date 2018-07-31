@@ -44,13 +44,13 @@ namespace vmstats
             var startPeriodTicks = (Convert.ToDateTime(msg.VmDate)).Ticks;
 
             // Calculate the time period to compress to, in ticks
-            var timePeriodTicks = new DateTime(0, 0, 0, 0, timePeriod, 0).Ticks;
+            var timePeriodTicks = TimeSpan.TicksPerMinute * timePeriod;
 
             // Foreach value in the metric get the time period it is for and add its value to the correct compressed time period
             foreach (var entry in msg.Measurements.Values)
             {
                 // Determine the compressed time
-                var compressedTimeTicks = ((entry.Key - startPeriodTicks) / timePeriodTicks) + startPeriodTicks;
+                var compressedTimeTicks = (((entry.Key - startPeriodTicks) / timePeriodTicks) * timePeriodTicks) + startPeriodTicks;
 
                 TempValue tempValue;
                 if (tempValues.TryGetValue(compressedTimeTicks, out tempValue))

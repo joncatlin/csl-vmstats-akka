@@ -117,6 +117,18 @@ namespace vmstats
             Props rlvProps = Props.Create(() => new RemoveLowValuesActor()).WithRouter(new RoundRobinPool(5));
             IActorRef rlv = vmstatsActorSystem.ActorOf(rlvProps, "Transforms-" + RemoveLowValuesActor.TRANSFORM_NAME.ToUpper());
 
+            // Create the SaveMetricActor actor pool
+            Props savProps = Props.Create(() => new SaveMetricActor()).WithRouter(new RoundRobinPool(5));
+            IActorRef sav = vmstatsActorSystem.ActorOf(savProps, "Transforms-" + SaveMetricActor.TRANSFORM_NAME.ToUpper());
+
+            // Create the ViewMetricActor actor pool
+            Props viwProps = Props.Create(() => new ViewMetricActor()).WithRouter(new RoundRobinPool(5));
+            IActorRef viw = vmstatsActorSystem.ActorOf(viwProps, "Transforms-" + ViewMetricActor.TRANSFORM_NAME.ToUpper());
+
+            // Create the CompactTimeActor actor pool
+            Props cmpProps = Props.Create(() => new CompactTimeActor()).WithRouter(new RoundRobinPool(5));
+            IActorRef cmp = vmstatsActorSystem.ActorOf(cmpProps, "Transforms-" + CompactTimeActor.TRANSFORM_NAME.ToUpper());
+
             // Create the metric dispatcher
             Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor(snapshotPath, guiWebserUrl));
             IActorRef metricAccumulatorDispatcherActor = vmstatsActorSystem.ActorOf(metricAccumulatorDispatcherProps,
