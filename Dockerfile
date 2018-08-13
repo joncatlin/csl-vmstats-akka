@@ -19,8 +19,7 @@ RUN mkdir /config
 VOLUME /config
 
 # Copy needed files
-COPY NLog.config .
-#COPY config.txt .
+#COPY NLog.config .
 
 # define the environment variables
 ENV DIR_NAME /data

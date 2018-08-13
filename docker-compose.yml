@@ -1,14 +1,13 @@
-version: '3'
-
+# version: '3'
 services:
+
   vmstats:
     image: joncatlin/csl-vmstats-akka
     volumes:
       - "/mount/vmstats-data/Desktops/:/data"
-      - "/mount/general-data/vmstats-config/:/config"
-      - "/mount/general-data/vmstats-snapshots/:/snapshots"
-      - "/mount/general-data/vmstats-logs/:/logs"
-    restart: always
+      - "/mount/vmstats-processed-data/vmstats-config/:/config"
+      - "/mount/vmstats-processed-data/vmstats-snapshots/:/snapshots"
+      - "/mount/vmstats-processed-data/vmstats-logs/:/logs"
     environment:
       VMNAME_PATTERN: "V-.*"
       VMSTATSGUI_WEBSERVER_URL: "http://docker01.dest.internal:8081/vmstats/ReturnResultToClient"

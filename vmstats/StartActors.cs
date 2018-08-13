@@ -16,6 +16,10 @@ namespace vmstats
         private static StartActors instance = null;
         private static readonly object padlock = new object();
 
+        // Instance variables
+        static readonly string ENV_CONFIG_FILE = "CONFIG_FILE";
+        private string configFile = null;
+
         StartActors()
         {
         }
@@ -36,29 +40,12 @@ namespace vmstats
             }
         }
 
-        // Names of all the environment variables needed by the application
-        static readonly string ENV_DIRNAME = "DIR_NAME";
-	    static readonly string ENV_FILETYPE = "FILE_TYPE";
-        static readonly string ENV_VMNAME_PATTERN = "VMNAME_PATTERN";
-        static readonly string ENV_CONFIG_FILE = "CONFIG_FILE";
-        static readonly string ENV_SNAPSHOT_PATH = "SNAPSHOT_PATH";
-        static readonly string ENV_VMSTATSGUI_WEBSERVER_URL = "VMSTATSGUI_WEBSERVER_URL";
-
-        // Local state initialized from envornment variables
-        private string fileType = null;
-        private string dirName = "dummyfilename";
-        private string vmNamePattern = null;
-        private string configFile = null;
-        private string snapshotPath = null;
-        private string guiWebserUrl = null;
-
         public ActorSystem vmstatsActorSystem;
 
         public ILoggingAdapter _log { get; set; }
 
         private void Initialize()
         {
-            // Initialise state from environment variables
             GetEnvironmentVariables();
 
             // Get the configuration of the akka system
@@ -79,16 +66,16 @@ namespace vmstats
             vmstatsActorSystem = ActorSystem.Create("vmstats", config);
             _log = vmstatsActorSystem.Log;
 
+            Props startupProps = Props.Create(() => new StartupActor());
+            IActorRef startupActor = vmstatsActorSystem.ActorOf(startupProps, StartupActor.ACTOR_NAME);
+            startupActor.Tell(new StartupActor.Startup());
+            _log.Debug("Creating the startup actor to start all other actors");
+
             /*
              * Create all of the transform actors so they are ready when needed. Each transform is a pool
              * of actors.
              */
-            // Create the RemoveBaseNoise actor pool
             /*
-            var rbnProps = Props.Create<RemoveBaseNoiseActor>().WithRouter(FromConfig.Instance);
-            IActorRef rbn = vmstatsActorSystem.ActorOf(rbnProps, "Transforms:" + RemoveBaseNoiseActor.TRANSFORM_NAME.ToUpper());
-            var rbnName = rbn.Path.ToString();
-*/
             Props rbnProps = Props.Create(() => new RemoveBaseNoiseActor()).WithRouter(new RoundRobinPool(5));
             IActorRef rbn = vmstatsActorSystem.ActorOf(rbnProps, "Transforms-" + RemoveBaseNoiseActor.TRANSFORM_NAME.ToUpper());
             var rbnName = rbn.Path.ToString();
@@ -168,19 +155,13 @@ namespace vmstats
             _log.Debug("Scheduling the MetricStoreManager with FindMetricStoreActorNames");
 */
         }
-
-        private void GetEnvironmentVariables ()
+        private void GetEnvironmentVariables()
         {
-            dirName = GetEnvironmentVariable(ENV_DIRNAME);
-            fileType = GetEnvironmentVariable(ENV_FILETYPE);
-            vmNamePattern = GetEnvironmentVariable(ENV_VMNAME_PATTERN);
             configFile = GetEnvironmentVariable(ENV_CONFIG_FILE);
-            snapshotPath = GetEnvironmentVariable(ENV_SNAPSHOT_PATH);
-            guiWebserUrl = GetEnvironmentVariable(ENV_VMSTATSGUI_WEBSERVER_URL);
         }
 
 
-        private string GetEnvironmentVariable (string envVarName)
+        private string GetEnvironmentVariable(string envVarName)
         {
             string temp = Environment.GetEnvironmentVariable(envVarName);
             if (temp == null)
@@ -195,40 +176,42 @@ namespace vmstats
             return temp;
         }
 
-/*
-        private static string GetConfiguration()
-        {
-            string config = @"
-                akka {  
-                    stdout-loglevel = INFO
-                    loglevel = INFO
-#                    loggers = [""Akka.Logger.NLog.NLogLogger, Akka.Logger.NLog""]
-                    log-config-on-start = on
-
-#                    actor
-#                    {
-#                      debug
-#                      {
-#                        receive = on      # log any received message
-#                        autoreceive = on  # log automatically received messages, e.g. PoisonPill
-#                        lifecycle = on    # log actor lifecycle changes
-#                        event-stream = on # log subscription changes for Akka.NET event stream
-#                        unhandled = on    # log unhandled messages sent to actors
-#                      }
-#                    }
-#                  }
-
-                # Dispatcher for the Snapshot file store
- #               snapshot -dispatcher {
- #                   type = Dispatcher
- #                   throughput = 10000
- #               }
 
 
-            ";
+        /*
+                private static string GetConfiguration()
+                {
+                    string config = @"
+                        akka {  
+                            stdout-loglevel = INFO
+                            loglevel = INFO
+        #                    loggers = [""Akka.Logger.NLog.NLogLogger, Akka.Logger.NLog""]
+                            log-config-on-start = on
 
-            return config;
-        }
-        */
+        #                    actor
+        #                    {
+        #                      debug
+        #                      {
+        #                        receive = on      # log any received message
+        #                        autoreceive = on  # log automatically received messages, e.g. PoisonPill
+        #                        lifecycle = on    # log actor lifecycle changes
+        #                        event-stream = on # log subscription changes for Akka.NET event stream
+        #                        unhandled = on    # log unhandled messages sent to actors
+        #                      }
+        #                    }
+        #                  }
+
+                        # Dispatcher for the Snapshot file store
+         #               snapshot -dispatcher {
+         #                   type = Dispatcher
+         #                   throughput = 10000
+         #               }
+
+
+                    ";
+
+                    return config;
+                }
+                */
     }
 }
