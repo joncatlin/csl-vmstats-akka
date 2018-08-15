@@ -1,8 +1,11 @@
-# version: '3'
+version: '3'
 services:
 
   vmstats:
     image: joncatlin/csl-vmstats-akka
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - "/mount/vmstats-data/Desktops/:/data"
       - "/mount/vmstats-processed-data/vmstats-config/:/config"
