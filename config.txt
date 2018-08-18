@@ -1,21 +1,68 @@
+my-dispatcher {
+  
+  # Dispatcher is the name of the event-based dispatcher
+  type = PinnedDispatcher
+}
+
+my-dispatcher-doesnotwork {
+  
+  # Dispatcher is the name of the event-based dispatcher
+  type = ForkJoinDispatcher
+  
+  # What kind of ExecutionService to use
+  executor = "fork-join-executor"
+  
+  # Configuration for the fork join pool
+  fork-join-executor {
+	  # Min number of threads to cap factor-based parallelism number to
+	  parallelism-min = 1
+	  # Parallelism (threads) ... ceil(available processors * factor)
+	  parallelism-factor = 1.0
+	  # Max number of threads to cap factor-based parallelism number to
+	  parallelism-max = 2
+  }
+  
+  # Throughput defines the maximum number of messages to be
+  # processed per actor before the thread jumps to the next actor.
+  # Set to 1 for as fair as possible.
+  throughput = 100
+}
+
+my-fork-join-dispatcher {
+  type = ForkJoinDispatcher
+  throughput = 100
+  dedicated-thread-pool {
+      thread-count = 2
+      deadlock-timeout = 3s
+      threadtype = background
+  }
+}
+
 akka {
 	stdout-loglevel = DEBUG
 	loglevel = DEBUG
 	loggers = ["Akka.Logger.NLog.NLogLogger, Akka.Logger.NLog"]
 	log-config-on-start = on
 
-	actor
-	{
-		debug
+    actor
+    {
+        debug
 		{
-		receive = on      # log any received message
-		autoreceive = on  # log automatically received messages, e.g. PoisonPill
-		lifecycle = on    # log actor lifecycle changes
-		event-stream = on # log subscription changes for Akka.NET event stream
-		unhandled = on    # log unhandled messages sent to actors
+			receive = on      # log any received message
+			autoreceive = on  # log automatically received messages, e.g. PoisonPill
+			lifecycle = on    # log actor lifecycle changes
+			event-stream = on # log subscription changes for Akka.NET event stream
+			unhandled = on    # log unhandled messages sent to actors
 		}
+
 	}
 }
+
+akka.actor.deployment.default {
+    dispatcher = "my-fork-join-dispatcher"
+}
+
+
 
 # Local file system snapshot store plugin.
 akka.persistence.snapshot-store.local {
@@ -41,3 +88,5 @@ akka.persistence.snapshot-store.local {
     # the persistent actor will be stopped.
     max-load-attempts = 3
 }
+
+

@@ -1,5 +1,8 @@
 FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
 WORKDIR /app
+# Copy the config file 
+COPY NLog.config .
+
 EXPOSE 80
 
 # Where to look for the metric data
@@ -17,9 +20,6 @@ VOLUME /logs
 # Where to look for the configuration
 RUN mkdir /config
 VOLUME /config
-
-# Copy needed files
-#COPY NLog.config .
 
 # define the environment variables
 ENV DIR_NAME /data

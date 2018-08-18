@@ -102,7 +102,7 @@ namespace vmstats
 
             // Create the actor
             var actor = Context.ActorOf(Props.Create(() =>
-                new MetricStoreActor(vmName, date)), "MetricStore:" + vmName + ":" + date);
+                new MetricStoreActor(vmName, date)).WithDispatcher("my-dispatcher"), "MetricStore:" + vmName + ":" + date);
 
             // Add it to the list of metric actors being tracked
             AddMetricActor(vmName, date, actor);
