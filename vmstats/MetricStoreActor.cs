@@ -54,7 +54,7 @@ namespace vmstats
             Command<UpsertMetric>(um => Persist(um, s => {
                 _log.Debug($"Received UpserMetrics msg actor id={PersistenceId}");
                 ProcessUpsertMetric(um);
-                SaveSnapshot(_metricStore);
+                SaveSnapshot(_metricStore.Clone());
             }));
 
             Command<SaveSnapshotSuccess>(success => {
@@ -75,7 +75,7 @@ namespace vmstats
             });
 
             Command<SaveSnapshotFailure>(failure => {
-                _log.Error($"ERROR: Failed to save snapshot for actor with id={PersistenceId}");
+                _log.Error($"ERROR: Failed to save snapshot for actor with id={PersistenceId}.\nMessage:{failure.Cause.Message}");
             });
 
             Command<Messages.BuildTransformSeries>(msg => ProcessPipeline(msg));

@@ -17,6 +17,22 @@ namespace vmstats
             this.date = date;
             this.metrics = new Dictionary<string, Metric>();
         }
+
+        protected MetricStore(MetricStore another)
+        {
+            this.vmName = another.vmName;
+            this.date = another.date;
+            this.metrics = new Dictionary<string, Metric>();
+            foreach (var entry in another.metrics)
+            {
+                this.metrics.Add(entry.Key, entry.Value);
+            }
+        }
+
+        public MetricStore Clone()
+        {
+            return new MetricStore(this);
+        }        
     }
 
 }

@@ -102,7 +102,7 @@ namespace vmstats
 
             // Create the actor
             var actor = Context.ActorOf(Props.Create(() =>
-                new MetricStoreActor(vmName, date)).WithDispatcher("my-dispatcher"), "MetricStore:" + vmName + ":" + date);
+                new MetricStoreActor(vmName, date)).WithDispatcher("vmstats-metricstore-dispatcher"), "MetricStore:" + vmName + ":" + date);
 
             // Add it to the list of metric actors being tracked
             AddMetricActor(vmName, date, actor);
@@ -123,7 +123,7 @@ namespace vmstats
 
                 // Create the actor for the accumulator and store its reference
                 actor = Context.ActorOf(Props.Create(() =>
-                    new MetricAccumulatorActor(msg.vmName, msg.date, actor)), key);
+                    new MetricAccumulatorActor(msg.vmName, msg.date, actor)).WithDispatcher("vmstats-default-dispatcher"), key);
                 routingTable.Add(key, actor);
 
                 // Dispatch the message
@@ -331,6 +331,32 @@ namespace vmstats
                 }
             }
         }
+
+        protected override SupervisorStrategy SupervisorStrategy()
+        {
+            return new OneForOneStrategy(
+                maxNrOfRetries: 5,
+                withinTimeRange: TimeSpan.FromMinutes(1),
+                localOnlyDecider: ex =>
+                {
+                    // TODO Figure out what supervisor strategy is needed and implement it. For now just log the error and move on
+                    _log.Error($"Actor error detected. Error is {ex.Message}. Error occurred at {ex.StackTrace}");
+                    switch (ex)
+                    {
+                        /*
+                        case ArithmeticException ae:
+                            return Directive.Resume;
+                        case NullReferenceException nre:
+                            return Directive.Restart;
+                        case ArgumentException are:
+                            return Directive.Stop;
+                        */
+                        default:
+                            return Directive.Escalate;
+                    }
+                });
+        }
+
 
 
     }

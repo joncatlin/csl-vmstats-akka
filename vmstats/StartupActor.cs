@@ -53,54 +53,54 @@ namespace vmstats
              * Create all of the transform actors so they are ready when needed. Each transform is a pool
              * of actors.
              */
-            Props rbnProps = Props.Create(() => new RemoveBaseNoiseActor()).WithDispatcher("my-dispatcher").WithRouter(new RoundRobinPool(5));
+            Props rbnProps = Props.Create(() => new RemoveBaseNoiseActor()).WithDispatcher("vmstats-default-dispatcher").WithRouter(new RoundRobinPool(5));
             IActorRef rbn = Context.ActorOf(rbnProps, "Transforms-" + RemoveBaseNoiseActor.TRANSFORM_NAME.ToUpper());
             var rbnName = rbn.Path.ToString();
 
             // Create the RemoveSpikeNoise actor pool
-            Props rspProps = Props.Create(() => new RemoveSpikeActor()).WithDispatcher("my-dispatcher").WithRouter(new RoundRobinPool(5));
+            Props rspProps = Props.Create(() => new RemoveSpikeActor()).WithDispatcher("vmstats-default-dispatcher").WithRouter(new RoundRobinPool(5));
             IActorRef rsp = Context.ActorOf(rspProps, "Transforms-" + RemoveSpikeActor.TRANSFORM_NAME.ToUpper());
 
             // Create the PercentizeActor actor pool
-            Props pctProps = Props.Create(() => new PercentizeActor()).WithDispatcher("my-dispatcher").WithRouter(new RoundRobinPool(5));
+            Props pctProps = Props.Create(() => new PercentizeActor()).WithDispatcher("vmstats-default-dispatcher").WithRouter(new RoundRobinPool(5));
             IActorRef pct = Context.ActorOf(pctProps, "Transforms-" + PercentizeActor.TRANSFORM_NAME.ToUpper());
 
             // Create the CombineTransformActor actor pool
-            Props comProps = Props.Create(() => new CombineTransformActor()).WithDispatcher("my-dispatcher").WithRouter(new ConsistentHashingPool(5));
+            Props comProps = Props.Create(() => new CombineTransformActor()).WithDispatcher("vmstats-default-dispatcher").WithRouter(new ConsistentHashingPool(5));
             IActorRef com = Context.ActorOf(comProps, "Transforms-" + CombineTransformActor.TRANSFORM_NAME.ToUpper());
 
             // Create the RemovePercentileActor actor pool
-            Props rptProps = Props.Create(() => new RemovePercentileActor()).WithDispatcher("my-dispatcher").WithRouter(new RoundRobinPool(5));
+            Props rptProps = Props.Create(() => new RemovePercentileActor()).WithDispatcher("vmstats-default-dispatcher").WithRouter(new RoundRobinPool(5));
             IActorRef rpt = Context.ActorOf(rptProps, "Transforms-" + RemovePercentileActor.TRANSFORM_NAME.ToUpper());
 
             // Create the RemovePercentileActor actor pool
-            Props fldProps = Props.Create(() => new FlattenDeviationActor()).WithDispatcher("my-dispatcher").WithRouter(new RoundRobinPool(5));
+            Props fldProps = Props.Create(() => new FlattenDeviationActor()).WithDispatcher("vmstats-default-dispatcher").WithRouter(new RoundRobinPool(5));
             IActorRef fld = Context.ActorOf(fldProps, "Transforms-" + FlattenDeviationActor.TRANSFORM_NAME.ToUpper());
 
             // Create the RemoveLowValuesActor actor pool
-            Props rlvProps = Props.Create(() => new RemoveLowValuesActor()).WithDispatcher("my-dispatcher").WithRouter(new RoundRobinPool(5));
+            Props rlvProps = Props.Create(() => new RemoveLowValuesActor()).WithDispatcher("vmstats-default-dispatcher").WithRouter(new RoundRobinPool(5));
             IActorRef rlv = Context.ActorOf(rlvProps, "Transforms-" + RemoveLowValuesActor.TRANSFORM_NAME.ToUpper());
 
             // Create the SaveMetricActor actor pool
-            Props savProps = Props.Create(() => new SaveMetricActor()).WithDispatcher("my-dispatcher").WithRouter(new RoundRobinPool(5));
+            Props savProps = Props.Create(() => new SaveMetricActor()).WithDispatcher("vmstats-default-dispatcher").WithRouter(new RoundRobinPool(5));
             IActorRef sav = Context.ActorOf(savProps, "Transforms-" + SaveMetricActor.TRANSFORM_NAME.ToUpper());
 
             // Create the ViewMetricActor actor pool
-            Props viwProps = Props.Create(() => new ViewMetricActor()).WithDispatcher("my-dispatcher").WithRouter(new RoundRobinPool(5));
+            Props viwProps = Props.Create(() => new ViewMetricActor()).WithDispatcher("vmstats-default-dispatcher").WithRouter(new RoundRobinPool(5));
             IActorRef viw = Context.ActorOf(viwProps, "Transforms-" + ViewMetricActor.TRANSFORM_NAME.ToUpper());
 
             // Create the CompactTimeActor actor pool
-            Props cmpProps = Props.Create(() => new CompactTimeActor()).WithDispatcher("my-dispatcher").WithRouter(new RoundRobinPool(5));
+            Props cmpProps = Props.Create(() => new CompactTimeActor()).WithDispatcher("vmstats-default-dispatcher").WithRouter(new RoundRobinPool(5));
             IActorRef cmp = Context.ActorOf(cmpProps, "Transforms-" + CompactTimeActor.TRANSFORM_NAME.ToUpper());
 
             // Create the metric dispatcher
-            Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor(snapshotPath, guiWebserUrl)).WithDispatcher("my-dispatcher");
+            Props metricAccumulatorDispatcherProps = Props.Create(() => new MetricAccumulatorDispatcherActor(snapshotPath, guiWebserUrl)).WithDispatcher("vmstats-default-dispatcher");
             IActorRef metricAccumulatorDispatcherActor = Context.ActorOf(metricAccumulatorDispatcherProps,
                 MetricAccumulatorDispatcherActor.ACTOR_NAME);
             _log.Debug("Creating the metricAccumulatorDispatcherActor");
 
             // Create the actor that will watch the directory for new files being added
-            Props directoryWatcherProps = Props.Create(() => new DirectoryWatcherActor(vmNamePattern, metricAccumulatorDispatcherActor)).WithDispatcher("my-dispatcher");
+            Props directoryWatcherProps = Props.Create(() => new DirectoryWatcherActor(vmNamePattern, metricAccumulatorDispatcherActor)).WithDispatcher("vmstats-default-dispatcher");
             IActorRef directoryWatcherActor = Context.ActorOf(directoryWatcherProps,
                 "directoryWatcherActor");
             _log.Debug("Creating the directoryWatcherActor");
