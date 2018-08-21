@@ -54,8 +54,10 @@ namespace vmstats
             Command<UpsertMetric>(um => Persist(um, s => {
                 _log.Debug($"Received UpserMetrics msg actor id={PersistenceId}");
                 ProcessUpsertMetric(um);
-                SaveSnapshot(_metricStore.Clone());
+//                SaveSnapshot(_metricStore.Clone());
             }));
+
+            Command<Messages.Stopping>(um => ProcessStopping());
 
             Command<SaveSnapshotSuccess>(success => {
                 // soft-delete the journal up until the sequence # at
@@ -66,12 +68,16 @@ namespace vmstats
                 var snapSelectCrit = new SnapshotSelectionCriteria(success.Metadata.SequenceNr - 1, success.Metadata.Timestamp, 0, new DateTime(0));
                 DeleteSnapshots(snapSelectCrit);
 
-                // Send a msg to the MetricStoreManager to inform it of a potentially new MetricStoreActor
-//                var actorPath = "/user/" + MetricStoreManagerActor.ACTOR_NAME + "/";
-//                var foundActor = Context.ActorSelection(actorPath);
-//                foundActor.Tell(new Messages.PotentialNewActor(_metricStore.vmName, _metricStore.date, success.Metadata.SequenceNr));
-
                 _log.Info($"Save snapshot successful for actor id={PersistenceId}");
+
+                // Tell all the metric accumulators dispatchers that this actor is finishing
+                var selection = Context.ActorSelection("/user/*/MetricAccumulatorDispatcher");
+//                var selection = Context.ActorSelection("/*/MetricAccumulatorDispatcher*");
+                selection.Tell(new Messages.MetricStoreActorStopping());
+
+                _log.Debug($"Signalled stopping to MetricAccumulatorDispatcher for actor id={PersistenceId}");
+
+                Context.Stop(Context.Self);
             });
 
             Command<SaveSnapshotFailure>(failure => {
@@ -81,6 +87,12 @@ namespace vmstats
             Command<Messages.BuildTransformSeries>(msg => ProcessPipeline(msg));
         }
 
+
+        private void ProcessStopping()
+        {
+            _log.Debug($"Processing stopping for actor id={PersistenceId}");
+            SaveSnapshot(_metricStore.Clone());
+        }
 
         private void ProcessPipeline(Messages.BuildTransformSeries cmd)
         {

@@ -66,7 +66,8 @@ namespace vmstats
             vmstatsActorSystem = ActorSystem.Create("vmstats", config);
             _log = vmstatsActorSystem.Log;
 
-            Props startupProps = Props.Create(() => new StartupActor()).WithDispatcher("vmstats-startup-dispatcher");
+            Props startupProps = Props.Create(() => new StartupActor()).WithDispatcher("vmstats-default-dispatcher");
+//            Props startupProps = Props.Create(() => new StartupActor()).WithDispatcher("vmstats-startup-dispatcher");
             IActorRef startupActor = vmstatsActorSystem.ActorOf(startupProps, StartupActor.ACTOR_NAME);
             startupActor.Tell(new StartupActor.Startup());
             _log.Debug("Creating the startup actor to start all other actors");

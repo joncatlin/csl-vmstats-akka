@@ -98,8 +98,14 @@ namespace vmstats
 
 
             // Tell all the metric accumulators dispatchers that this actor is finishing
-            var selection = Context.ActorSelection("/*/MetricAccumulatorDispatcher*");
+            //            / user / STARTUP_ACTOR / MetricAccumulatorDispatcher /
+
+//            var selection = Context.ActorSelection("/*/MetricAccumulatorDispatcher*");
+            var selection = Context.ActorSelection("/user/*/MetricAccumulatorDispatcher");
             selection.Tell(new Messages.Stopping());
+
+            // Tell the associated MetricStoreActor that this actor is finishing
+            metricStoreActor.Tell(new Messages.Stopping());
 
             Context.Stop(Context.Self);
 

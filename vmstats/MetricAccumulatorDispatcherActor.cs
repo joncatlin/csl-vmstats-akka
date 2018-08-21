@@ -64,6 +64,7 @@ namespace vmstats
             Receive<Messages.MetricsToBeProcessed>(msg => Dispatch(msg));
             Receive<Messages.NoMoreMetrics>(msg => NoMoreMetrics());
             Receive<Messages.Stopping>(msg => Stopping());
+            Receive<Messages.MetricStoreActorStopping>(msg => MetricStoreActorStopping());
             Receive<Messages.StartProcessingTransformPipeline>(msg => Process(msg));
             Receive<Messages.TransformSeries>(msg => ReturnResult(msg));
         }
@@ -176,6 +177,15 @@ namespace vmstats
         {
             string name = Context.Sender.Path.Name;
             routingTable.Remove(name);
+            _log.Info($"Processing stop for actor {name}");
+        }
+
+
+        private void MetricStoreActorStopping()
+        {
+            string name = Context.Sender.Path.Name;
+            storeTable.Remove(name);
+            _log.Info($"Processing MetricStoreActor stop for actor {name}");
         }
 
 
