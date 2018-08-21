@@ -5,6 +5,7 @@ using Akka.Routing;
 using Akka.Event;
 using System.Collections.Generic;
 using vmstats_shared;
+using System.Linq;
 
 namespace vmstats
 {
@@ -81,7 +82,8 @@ namespace vmstats
             }
 
             _log.Info("Checking directory for new files");
-            foreach (string file in Directory.EnumerateFiles(_dirName, "*.csv", SearchOption.TopDirectoryOnly))
+            var files = Directory.EnumerateFiles(_dirName, "*.csv", SearchOption.TopDirectoryOnly).OrderBy(filename => filename);
+            foreach (string file in files)
             {
                 noFilesFound = false;
 

@@ -116,6 +116,16 @@ namespace vmstats
                           directoryWatcherActor, new DirectoryWatcherActor.CheckDirCommand(), ActorRefs.NoSender);
             _log.Debug("Scheduling the directoryWatcherActor with CheckDirCommand");
 
+            // Initialize the resource monitor
+            Props resourceMonitorProps = Props.Create(() => new ResourceMonitorActor()).WithDispatcher("vmstats-default-dispatcher");
+            IActorRef resourceMonitorActor = Context.ActorOf(resourceMonitorProps, "resourceMonitorActor");
+            _log.Debug("Creating the resourceMonitorActor");
+
+            // Schedule the DirectoryWatcher to check the directory
+            Context.System.Scheduler
+               .ScheduleTellRepeatedly(TimeSpan.FromSeconds(0),
+                         TimeSpan.FromSeconds(1),
+                          resourceMonitorActor, new ResourceMonitorActor.CheckResources(), ActorRefs.NoSender);
         }
 
 
