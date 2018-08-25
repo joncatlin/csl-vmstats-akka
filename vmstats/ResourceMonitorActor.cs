@@ -40,17 +40,17 @@ namespace vmstats
             var threads = proc.Threads;
             var maxWorkingSet = proc.MaxWorkingSet;
 
-            var curPhysicalMem = proc.WorkingSet64;
+            var curPhysicalMem = proc.WorkingSet64 / 1024 / 1024 / 1024;
             var maxPhysicalMem = proc.MaxWorkingSet;
 
-            var currPagedMem = proc.PagedMemorySize64;
-            var currVirtMem = proc.VirtualMemorySize64;
+            var currPagedMem = proc.PagedMemorySize64 / 1024 / 1024 / 1024;
+            var currVirtMem = proc.VirtualMemorySize64 / 1024 / 1024 / 1024;
 
-            Console.WriteLine($" maxWorkingSet = {maxWorkingSet}");
-            Console.WriteLine($" curPhysicalMem = {curPhysicalMem}");
-            Console.WriteLine($" maxPhysicalMem = {maxPhysicalMem}");
-            Console.WriteLine($" currPagedMem = {currPagedMem}");
-            Console.WriteLine($" currVirtMem = {currVirtMem}");
+//            Console.WriteLine($" maxWorkingSet = {maxWorkingSet}");
+            Console.WriteLine($"|\tcurPhysicalMem = {curPhysicalMem} GB");
+//            Console.WriteLine($" maxPhysicalMem = {maxPhysicalMem}");
+            Console.WriteLine($"|\tcurrPagedMem = {currPagedMem} GB");
+            Console.WriteLine($"|\tcurrVirtMem = {currVirtMem} GB");
 
             //            Console.WriteLine("My process used working set {0:n3} K of working set and CPU {1:n} msec", mem / 1024.0, cpu.TotalMilliseconds);
             var currentCPUTime = proc.TotalProcessorTime;
@@ -61,14 +61,14 @@ namespace vmstats
             var rawCPUPercentage = CPUdiff / timeDiff.TotalMilliseconds;
             var totalCPUPercentage = (rawCPUPercentage * 100) / (numProcessors * 100);
 
-            Console.WriteLine($"currentCPUTime = {currentCPUTime}");
-            Console.WriteLine($"previousCPUTime = {previousCPUTime}");
-            Console.WriteLine($"currentClockTime = {currentClockTime.ToLongTimeString()}");
-            Console.WriteLine($"previousClockTime = {previousClockTime.ToLongTimeString()}");
-            Console.WriteLine($"timeDiff.TotalMilliseconds = {timeDiff.TotalMilliseconds}");
-            Console.WriteLine($"CPUdiff = {CPUdiff}");
-            Console.WriteLine($"rawCPUPercentage = {rawCPUPercentage}");
-            Console.WriteLine($"totalCPUPercentage = {totalCPUPercentage:P}");
+//            Console.WriteLine($"currentCPUTime = {currentCPUTime}");
+//            Console.WriteLine($"previousCPUTime = {previousCPUTime}");
+//            Console.WriteLine($"currentClockTime = {currentClockTime.ToLongTimeString()}");
+//            Console.WriteLine($"previousClockTime = {previousClockTime.ToLongTimeString()}");
+//            Console.WriteLine($"timeDiff.TotalMilliseconds = {timeDiff.TotalMilliseconds}");
+//            Console.WriteLine($"CPUdiff = {CPUdiff}");
+//            Console.WriteLine($"rawCPUPercentage = {rawCPUPercentage}");
+            Console.WriteLine($"|\ttotalCPUPercentage = {totalCPUPercentage:P}");
 
             // Store the current values for next time
             previousCPUTime = currentCPUTime;

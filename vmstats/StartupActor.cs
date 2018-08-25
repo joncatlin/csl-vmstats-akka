@@ -126,6 +126,11 @@ namespace vmstats
                .ScheduleTellRepeatedly(TimeSpan.FromSeconds(0),
                          TimeSpan.FromSeconds(1),
                           resourceMonitorActor, new ResourceMonitorActor.CheckResources(), ActorRefs.NoSender);
+
+            var count = 0;
+            foreach (var child in Context.GetChildren()) count++;
+
+            Console.WriteLine($"Actor name: {Context.Self.Path} has {count} children");
         }
 
 
