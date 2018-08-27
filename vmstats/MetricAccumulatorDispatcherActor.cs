@@ -134,6 +134,12 @@ namespace vmstats
             {
                 actor.Tell(msg);
             }
+
+            // TODO remove, temp to find potential leak
+            var count = 0;
+            foreach (var child in Context.GetChildren()) count++;
+            _log.Info($"Actor name: { Context.Self.Path} has { count} children after dispatch");
+
         }
 
 
@@ -178,6 +184,11 @@ namespace vmstats
             string name = Context.Sender.Path.Name;
             routingTable.Remove(name);
             _log.Info($"Processing stop for actor {name}");
+
+            // TODO remove, temp to find potential leak
+            var count = 0;
+            foreach (var child in Context.GetChildren()) count++;
+            _log.Info($"Actor name: { Context.Self.Path} has { count} children after stop");
         }
 
 
